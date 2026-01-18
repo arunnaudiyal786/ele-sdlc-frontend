@@ -5,17 +5,17 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
-  FileText,
-  FolderKanban,
-  BarChart3,
+  Database,
+  Brain,
+  Search,
+  Calculator,
+  FileCode,
+  ListTodo,
   Settings,
   HelpCircle,
   Bell,
   ChevronDown,
-  Plus,
   CheckCircle2,
-  Clock,
-  AlertCircle,
   Zap,
 } from "lucide-react"
 
@@ -43,6 +43,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { currentUser } from "@/lib/mock-data"
+import { useSDLC, type AgentName } from "@/contexts/sdlc-context"
 
 // Type definitions for navigation items
 interface NavSubItem {
@@ -50,6 +51,7 @@ interface NavSubItem {
   url: string
   icon: React.ComponentType<{ className?: string }>
   indicator?: 'active' | 'success' | 'warning'
+  agentName?: AgentName // Links to SDLC agent for completion status
 }
 
 interface NavItem {
@@ -68,57 +70,40 @@ const mainNavItems: NavItem[] = [
     icon: LayoutDashboard,
   },
   {
-    title: "Assessments",
-    url: "/assessments",
-    icon: FileText,
-    badge: 4,
-    subItems: [
-      {
-        title: "Active",
-        url: "/assessments?status=active",
-        icon: Clock,
-      },
-      {
-        title: "Completed",
-        url: "/assessments?status=completed",
-        icon: CheckCircle2,
-      },
-      {
-        title: "Archived",
-        url: "/assessments?status=archived",
-        icon: FolderKanban,
-      },
-    ],
+    title: "Data Engineering",
+    url: "/data-engineering",
+    icon: Database,
   },
   {
-    title: "Projects",
-    url: "/projects",
-    icon: FolderKanban,
+    title: "SDLC Intelligence",
+    url: "/sdlc-intelligence",
+    icon: Brain,
     subItems: [
       {
-        title: "Active Project",
-        url: "/projects?status=active",
-        icon: Zap,
-        indicator: "active",
+        title: "Historical Matches",
+        url: "/sdlc-intelligence/historical-matches",
+        icon: Search,
+        agentName: "historicalMatches",
       },
       {
-        title: "Project Done",
-        url: "/projects?status=done",
-        icon: CheckCircle2,
-        indicator: "success",
+        title: "Estimation Sheet",
+        url: "/sdlc-intelligence/estimation-sheet",
+        icon: Calculator,
+        agentName: "estimationSheet",
       },
       {
-        title: "Project On Hold",
-        url: "/projects?status=hold",
-        icon: AlertCircle,
-        indicator: "warning",
+        title: "TDD Generation",
+        url: "/sdlc-intelligence/tdd-generation",
+        icon: FileCode,
+        agentName: "tddGeneration",
+      },
+      {
+        title: "Jira Stories",
+        url: "/sdlc-intelligence/jira-stories",
+        icon: ListTodo,
+        agentName: "jiraStories",
       },
     ],
-  },
-  {
-    title: "Analytics",
-    url: "/analytics",
-    icon: BarChart3,
   },
 ]
 
@@ -149,6 +134,7 @@ interface NavItemProps {
 function NavItem({ item, isActive }: NavItemProps) {
   const [isOpen, setIsOpen] = React.useState(isActive)
   const pathname = usePathname()
+  const { isAgentComplete } = useSDLC()
 
   if (item.subItems) {
     return (
@@ -177,6 +163,7 @@ function NavItem({ item, isActive }: NavItemProps) {
             <SidebarMenuSub>
               {item.subItems.map((subItem) => {
                 const isSubActive = pathname === subItem.url || pathname.includes(subItem.url.split('?')[0])
+                const isComplete = subItem.agentName ? isAgentComplete(subItem.agentName) : false
                 return (
                   <SidebarMenuSubItem key={subItem.title}>
                     <SidebarMenuSubButton
@@ -187,17 +174,9 @@ function NavItem({ item, isActive }: NavItemProps) {
                       )}
                     >
                       <Link href={subItem.url}>
-                        {'indicator' in subItem && (
-                          <span
-                            className={cn(
-                              "mr-2 h-2 w-2 rounded-full",
-                              subItem.indicator === 'active' && "bg-primary",
-                              subItem.indicator === 'success' && "bg-success",
-                              subItem.indicator === 'warning' && "bg-warning"
-                            )}
-                          />
-                        )}
-                        {!('indicator' in subItem) && subItem.icon && (
+                        {isComplete ? (
+                          <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" />
+                        ) : (
                           <subItem.icon className="mr-2 h-4 w-4" />
                         )}
                         <span>{subItem.title}</span>

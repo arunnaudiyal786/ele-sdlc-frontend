@@ -3,6 +3,7 @@
 import * as React from "react"
 import type { WizardStep, WizardState, HistoricalMatch, AssessmentResult } from "@/types/assessment"
 import { historicalMatches, sampleAssessmentResult } from "@/lib/mock-data"
+import { useSDLC } from "./sdlc-context"
 
 interface WizardContextType {
   state: WizardState
@@ -64,6 +65,10 @@ interface WizardProviderProps {
 export function WizardProvider({ children }: WizardProviderProps) {
   const [state, setState] = React.useState<WizardState>(initialState)
   const [assessmentResult, setAssessmentResult] = React.useState<AssessmentResult | null>(null)
+  const cleanupRef = React.useRef<(() => void) | null>(null)
+
+  // Access SDLC context for streaming
+  const { runImpactPipeline, streaming, pipeline } = useSDLC()
 
   const currentStepIndex = stepOrder.indexOf(state.currentStep)
 
@@ -106,21 +111,39 @@ export function WizardProvider({ children }: WizardProviderProps) {
   const startAnalysis = React.useCallback(async () => {
     setState(prev => ({ ...prev, isAnalyzing: true, analysisProgress: 0 }))
 
-    // Simulate analysis progress
-    for (let i = 0; i <= 100; i += 10) {
-      await new Promise(resolve => setTimeout(resolve, 200))
-      setState(prev => ({ ...prev, analysisProgress: i }))
+    // Start the real pipeline with streaming
+    const cleanup = runImpactPipeline(state.requirementText, state.epicId || undefined)
+    cleanupRef.current = cleanup
+  }, [runImpactPipeline, state.requirementText, state.epicId])
+
+  // Watch for pipeline completion to navigate to results
+  React.useEffect(() => {
+    if (state.isAnalyzing && !streaming.isStreaming && pipeline.status === 'completed') {
+      // Pipeline finished - navigate to results
+      setAssessmentResult(sampleAssessmentResult) // Using mock for now, real data comes from SDLC context
+      setState(prev => ({
+        ...prev,
+        isAnalyzing: false,
+        analysisProgress: 100,
+        currentStep: 'results',
+      }))
+    } else if (state.isAnalyzing && !streaming.isStreaming && pipeline.status === 'error') {
+      // Pipeline errored
+      setState(prev => ({
+        ...prev,
+        isAnalyzing: false,
+        analysisProgress: 0,
+      }))
     }
+  }, [state.isAnalyzing, streaming.isStreaming, pipeline.status])
 
-    // Set mock result
-    setAssessmentResult(sampleAssessmentResult)
-
-    setState(prev => ({
-      ...prev,
-      isAnalyzing: false,
-      analysisProgress: 100,
-      currentStep: 'results',
-    }))
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      if (cleanupRef.current) {
+        cleanupRef.current()
+      }
+    }
   }, [])
 
   const resetWizard = React.useCallback(() => {
@@ -143,8 +166,8 @@ export function WizardProvider({ children }: WizardProviderProps) {
     matches: historicalMatches,
     selectedMatchIds: state.selectedMatchIds,
     toggleMatchSelection,
-    isAnalyzing: state.isAnalyzing,
-    analysisProgress: state.analysisProgress,
+    isAnalyzing: state.isAnalyzing || streaming.isStreaming,
+    analysisProgress: streaming.isStreaming ? streaming.progressPercent : state.analysisProgress,
     startAnalysis,
     assessmentResult,
     resetWizard,

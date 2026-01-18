@@ -1,7 +1,9 @@
 "use client"
 
-import { ArrowLeft, Loader2, Check, Users, Clock, TrendingUp } from "lucide-react"
+import { ArrowLeft, Loader2, Check, Users, Clock, TrendingUp, Circle } from "lucide-react"
 import { useWizard } from "@/contexts/wizard-context"
+import { useSDLC } from "@/contexts/sdlc-context"
+import { AGENTS } from "@/lib/api"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -17,8 +19,9 @@ export function HistoricalMatches() {
     goToPreviousStep,
     startAnalysis,
     isAnalyzing,
-    analysisProgress,
   } = useWizard()
+
+  const { streaming } = useSDLC()
 
   const canProceed = selectedMatchIds.length > 0
 
@@ -26,24 +29,100 @@ export function HistoricalMatches() {
     await startAnalysis()
   }
 
+  // Use real streaming progress if streaming, otherwise fallback
+  const progressPercent = streaming.isStreaming ? streaming.progressPercent : (isAnalyzing ? 0 : 100)
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      {/* Analysis Progress Overlay */}
+      {/* Analysis Progress with Agent Checklist */}
       {isAnalyzing && (
         <Card className="border-primary bg-primary/5">
-          <CardContent className="py-8">
-            <div className="flex flex-col items-center gap-4 text-center">
-              <Loader2 className="h-12 w-12 animate-spin text-primary" />
-              <div>
-                <h3 className="text-lg font-semibold">Analyzing Impact...</h3>
-                <p className="text-sm text-muted-foreground">
-                  AI is generating your impact assessment based on selected historical matches
-                </p>
+          <CardContent className="py-6">
+            <div className="space-y-6">
+              {/* Header with spinner */}
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold">Analysis in Progress</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Processing your requirement through the AI pipeline...
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-primary">{progressPercent}%</p>
+                </div>
               </div>
-              <Progress value={analysisProgress} className="w-64" />
-              <p className="text-sm font-medium text-primary">
-                {analysisProgress}% Complete
-              </p>
+
+              {/* Progress bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Progress</span>
+                  <span className="font-medium">
+                    {streaming.completedAgents.length} of {AGENTS.length} agents complete
+                  </span>
+                </div>
+                <Progress value={progressPercent} className="h-2" />
+              </div>
+
+              {/* Current agent indicator */}
+              {streaming.currentAgentName && (
+                <div className="rounded-lg bg-background/50 p-3">
+                  <p className="text-sm">
+                    <span className="text-muted-foreground">Current: </span>
+                    <span className="font-medium">
+                      {AGENTS.find(a => a.name === streaming.currentAgentName)?.displayName || streaming.currentAgentName}
+                    </span>
+                  </p>
+                </div>
+              )}
+
+              {/* Agent checklist grid */}
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {AGENTS.map((agent, idx) => {
+                  const isComplete = streaming.completedAgents.includes(agent.name)
+                  const isCurrent = idx === streaming.currentAgentIndex
+                  const isPending = !isComplete && !isCurrent
+
+                  return (
+                    <div
+                      key={agent.name}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg border p-3 transition-all",
+                        isComplete && "border-green-500/30 bg-green-500/5",
+                        isCurrent && "border-primary bg-primary/5 shadow-sm",
+                        isPending && "border-border bg-background/30 opacity-60"
+                      )}
+                    >
+                      <div className={cn(
+                        "flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
+                        isComplete && "bg-green-500 text-white",
+                        isCurrent && "bg-primary text-primary-foreground",
+                        isPending && "bg-muted text-muted-foreground"
+                      )}>
+                        {isComplete ? (
+                          <Check className="h-3.5 w-3.5" />
+                        ) : isCurrent ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Circle className="h-3 w-3" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className={cn(
+                          "text-sm font-medium truncate",
+                          isComplete && "text-green-700 dark:text-green-400",
+                          isCurrent && "text-primary",
+                          isPending && "text-muted-foreground"
+                        )}>
+                          {agent.displayName}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </CardContent>
         </Card>

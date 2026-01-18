@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { Header } from "@/components/layout/header";
 import { Toaster } from "@/components/ui/sonner";
+import { SDLCProvider } from "@/contexts/sdlc-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,19 +29,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            <Header />
-            <main className="flex-1 overflow-auto bg-background p-6">
-              {children}
-            </main>
-          </SidebarInset>
-        </SidebarProvider>
+        <SDLCProvider>
+          <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset>
+              <Header />
+              <main className="flex-1 overflow-auto bg-background p-6">
+                {children}
+              </main>
+            </SidebarInset>
+          </SidebarProvider>
+        </SDLCProvider>
         <Toaster />
       </body>
     </html>
