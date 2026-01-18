@@ -157,6 +157,10 @@ export interface PipelineResponse {
   risks_output: RisksOutput | null
   error_message: string | null
   messages: Array<{ role: string; content: string }>
+  // Historical matches from hybrid search
+  historical_matches?: HistoricalMatchResult[]
+  requirement_text?: string
+  extracted_keywords?: string[]
 }
 
 // Health Check Response
@@ -164,6 +168,25 @@ export interface HealthResponse {
   status: string
   version: string
   ollama: string
+}
+
+// Session Summary for list view
+export interface SessionSummaryItem {
+  session_id: string
+  created_at: string
+  status: PipelineStatus
+  requirement_text?: string
+  jira_epic_id?: string
+  total_story_points?: number
+  total_hours?: number
+}
+
+// Session List Response
+export interface SessionListResponse {
+  sessions: SessionSummaryItem[]
+  total: number
+  limit: number
+  offset: number
 }
 
 // ============================================

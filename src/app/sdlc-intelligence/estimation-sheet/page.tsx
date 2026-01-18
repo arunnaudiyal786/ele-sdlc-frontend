@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { NoAssessmentState } from "@/components/sdlc/no-assessment-state"
+import { TechInfoBox, TECH_INFO } from "@/components/sdlc/tech-info-box"
 
 export default function EstimationSheetPage() {
   const { pipeline, isAgentComplete } = useSDLC()
@@ -69,7 +70,10 @@ export default function EstimationSheetPage() {
             <Calculator className="h-5 w-5 text-green-500" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Estimation Sheet</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-semibold tracking-tight">Estimation Sheet</h1>
+              <TechInfoBox {...TECH_INFO.estimation} />
+            </div>
             <p className="text-sm text-muted-foreground">
               Effort breakdown and resource planning
             </p>

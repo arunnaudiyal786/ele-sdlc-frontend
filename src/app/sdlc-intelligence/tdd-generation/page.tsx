@@ -20,6 +20,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { NoAssessmentState } from "@/components/sdlc/no-assessment-state"
+import { TechInfoBox, TECH_INFO } from "@/components/sdlc/tech-info-box"
 
 export default function TDDGenerationPage() {
   const { pipeline, isAgentComplete } = useSDLC()
@@ -60,7 +61,10 @@ export default function TDDGenerationPage() {
             <FileCode className="h-5 w-5 text-green-500" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{tdd.tdd_name}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-semibold tracking-tight">{tdd.tdd_name}</h1>
+              <TechInfoBox {...TECH_INFO.tdd} />
+            </div>
             <p className="text-sm text-muted-foreground">
               Technical Design Document
             </p>

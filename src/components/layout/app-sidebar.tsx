@@ -17,6 +17,7 @@ import {
   ChevronDown,
   CheckCircle2,
   Zap,
+  History,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -104,6 +105,11 @@ const mainNavItems: NavItem[] = [
         agentName: "jiraStories",
       },
     ],
+  },
+  {
+    title: "Previous Outputs",
+    url: "/previous-outputs",
+    icon: History,
   },
 ]
 

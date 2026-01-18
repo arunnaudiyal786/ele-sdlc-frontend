@@ -5,6 +5,7 @@ import type {
   PipelineResponse,
   HealthResponse,
   StreamEvent,
+  SessionListResponse,
 } from './types'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
@@ -66,6 +67,16 @@ export async function getPipelineSummary(
   sessionId: string
 ): Promise<PipelineResponse> {
   return fetchApi<PipelineResponse>(`/api/v1/impact/${sessionId}/summary`)
+}
+
+// List all sessions with pagination
+export async function listSessions(
+  limit: number = 50,
+  offset: number = 0
+): Promise<SessionListResponse> {
+  return fetchApi<SessionListResponse>(
+    `/api/v1/session/list?limit=${limit}&offset=${offset}`
+  )
 }
 
 // Generate a unique session ID

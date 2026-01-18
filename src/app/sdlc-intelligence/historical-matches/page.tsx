@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { NoAssessmentState } from "@/components/sdlc/no-assessment-state"
+import { TechInfoBox, TECH_INFO } from "@/components/sdlc/tech-info-box"
 
 export default function HistoricalMatchesPage() {
   const { pipeline, isAgentComplete } = useSDLC()
@@ -52,7 +53,10 @@ export default function HistoricalMatchesPage() {
             <Search className="h-5 w-5 text-green-500" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Historical Matches</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-semibold tracking-tight">Historical Matches</h1>
+              <TechInfoBox {...TECH_INFO.historicalMatches} />
+            </div>
             <p className="text-sm text-muted-foreground">
               Similar projects have been identified
             </p>

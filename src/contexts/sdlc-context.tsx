@@ -6,6 +6,7 @@ import {
   generateSessionId,
   AGENTS,
   type PipelineStatus,
+  type PipelineResponse,
   type ImpactedModulesOutput,
   type EstimationEffortOutput,
   type TDDOutput,
@@ -69,6 +70,7 @@ interface SDLCContextType {
   // Actions
   runImpactPipeline: (requirementText: string, jiraEpicId?: string) => () => void
   resetPipeline: () => void
+  loadSession: (response: PipelineResponse) => void
   // Agent status helpers
   isAgentComplete: (agent: AgentName) => boolean
   setAgentStatus: (agent: AgentName, complete: boolean) => void
@@ -284,6 +286,27 @@ export function SDLCProvider({ children }: SDLCProviderProps) {
     setStreaming(initialStreamingState)
   }, [])
 
+  // Load a previous session from a PipelineResponse
+  const loadSession = React.useCallback((response: PipelineResponse) => {
+    setPipeline({
+      isRunning: false,
+      sessionId: response.session_id,
+      status: response.status,
+      error: response.error_message,
+      requirementText: '', // Not available in summary response
+      jiraEpicId: '',
+      impactedModules: response.impacted_modules_output,
+      estimationEffort: response.estimation_effort_output,
+      tdd: response.tdd_output,
+      jiraStories: response.jira_stories_output,
+      codeImpact: response.code_impact_output,
+      risks: response.risks_output,
+      messages: response.messages || [],
+    })
+    setAgentCompletion(getAgentCompletionFromStatus(response.status))
+    setStreaming(initialStreamingState)
+  }, [])
+
   // Check if a specific agent is complete
   const isAgentComplete = React.useCallback((agent: AgentName): boolean => {
     switch (agent) {
@@ -324,6 +347,7 @@ export function SDLCProvider({ children }: SDLCProviderProps) {
     streaming,
     runImpactPipeline,
     resetPipeline,
+    loadSession,
     isAgentComplete,
     setAgentStatus,
   }

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/collapsible"
 import { ChevronDown } from "lucide-react"
 import { NoAssessmentState } from "@/components/sdlc/no-assessment-state"
+import { TechInfoBox, TECH_INFO } from "@/components/sdlc/tech-info-box"
 
 const storyTypeIcons = {
   Story: ListTodo,
@@ -76,7 +77,10 @@ export default function JiraStoriesPage() {
             <ListTodo className="h-5 w-5 text-green-500" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Jira Stories</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-semibold tracking-tight">Jira Stories</h1>
+              <TechInfoBox {...TECH_INFO.jiraStories} />
+            </div>
             <p className="text-sm text-muted-foreground">
               {jiraData.story_count} stories • {jiraData.total_story_points} story points
             </p>
