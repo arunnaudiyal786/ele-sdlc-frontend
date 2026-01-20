@@ -125,6 +125,22 @@ export default function HistoricalMatchesPage() {
         </CardContent>
       </Card>
 
+      {/* Navigation */}
+      <div className="flex justify-between">
+        <Button asChild variant="outline">
+          <Link href="/sdlc-intelligence">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Assessment
+          </Link>
+        </Button>
+        <Button asChild>
+          <Link href="/sdlc-intelligence/estimation-sheet">
+            Next: Estimation Sheet
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
+
       {/* Requirement Context */}
       <Card>
         <CardHeader>
@@ -293,22 +309,6 @@ export default function HistoricalMatchesPage() {
           </CardContent>
         </Card>
       )}
-
-      {/* Navigation */}
-      <div className="flex justify-between">
-        <Button asChild variant="outline">
-          <Link href="/sdlc-intelligence">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Assessment
-          </Link>
-        </Button>
-        <Button asChild>
-          <Link href="/sdlc-intelligence/estimation-sheet">
-            Next: Estimation Sheet
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
     </div>
   )
 }

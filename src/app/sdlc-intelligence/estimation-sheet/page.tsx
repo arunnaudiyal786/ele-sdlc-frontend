@@ -127,6 +127,22 @@ export default function EstimationSheetPage() {
         </CardContent>
       </Card>
 
+      {/* Navigation */}
+      <div className="flex justify-between">
+        <Button asChild variant="outline">
+          <Link href="/sdlc-intelligence/historical-matches">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Historical Matches
+          </Link>
+        </Button>
+        <Button asChild>
+          <Link href="/sdlc-intelligence/tdd-generation">
+            Next: TDD Generation
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
@@ -287,22 +303,6 @@ export default function EstimationSheetPage() {
           </CardContent>
         </Card>
       )}
-
-      {/* Navigation */}
-      <div className="flex justify-between">
-        <Button asChild variant="outline">
-          <Link href="/sdlc-intelligence/historical-matches">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Historical Matches
-          </Link>
-        </Button>
-        <Button asChild>
-          <Link href="/sdlc-intelligence/tdd-generation">
-            Next: TDD Generation
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
     </div>
   )
 }

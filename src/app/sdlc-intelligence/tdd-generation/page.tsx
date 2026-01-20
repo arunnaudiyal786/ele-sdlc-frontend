@@ -116,6 +116,22 @@ export default function TDDGenerationPage() {
         </CardContent>
       </Card>
 
+      {/* Navigation */}
+      <div className="flex justify-between">
+        <Button asChild variant="outline">
+          <Link href="/sdlc-intelligence/estimation-sheet">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Estimation Sheet
+          </Link>
+        </Button>
+        <Button asChild>
+          <Link href="/sdlc-intelligence/jira-stories">
+            Next: Jira Stories
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
+
       {/* Quick Info Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
@@ -288,22 +304,6 @@ export default function TDDGenerationPage() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Navigation */}
-      <div className="flex justify-between">
-        <Button asChild variant="outline">
-          <Link href="/sdlc-intelligence/estimation-sheet">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Estimation Sheet
-          </Link>
-        </Button>
-        <Button asChild>
-          <Link href="/sdlc-intelligence/jira-stories">
-            Next: Jira Stories
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
     </div>
   )
 }

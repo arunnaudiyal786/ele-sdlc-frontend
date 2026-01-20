@@ -134,6 +134,21 @@ export default function JiraStoriesPage() {
         </CardContent>
       </Card>
 
+      {/* Navigation */}
+      <div className="flex justify-between">
+        <Button asChild variant="outline">
+          <Link href="/sdlc-intelligence/tdd-generation">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            TDD Generation
+          </Link>
+        </Button>
+        <Button asChild>
+          <Link href="/sdlc-intelligence">
+            New Assessment
+          </Link>
+        </Button>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-4">
         <Card>
@@ -297,21 +312,6 @@ export default function JiraStoriesPage() {
           </CardContent>
         </Card>
       )}
-
-      {/* Navigation */}
-      <div className="flex justify-between">
-        <Button asChild variant="outline">
-          <Link href="/sdlc-intelligence/tdd-generation">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            TDD Generation
-          </Link>
-        </Button>
-        <Button asChild>
-          <Link href="/sdlc-intelligence">
-            New Assessment
-          </Link>
-        </Button>
-      </div>
     </div>
   )
 }
