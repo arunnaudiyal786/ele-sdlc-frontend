@@ -14,6 +14,7 @@ import {
   type CodeImpactOutput,
   type RisksOutput,
   type StreamEvent,
+  type HistoricalMatchResult,
 } from "@/lib/api"
 
 // Agent completion status type
@@ -33,6 +34,7 @@ interface PipelineState {
   requirementText: string
   jiraEpicId: string
   // Agent outputs from backend
+  historicalMatches: HistoricalMatchResult[]
   impactedModules: ImpactedModulesOutput | null
   estimationEffort: EstimationEffortOutput | null
   tdd: TDDOutput | null
@@ -93,6 +95,7 @@ const initialPipelineState: PipelineState = {
   error: null,
   requirementText: '',
   jiraEpicId: '',
+  historicalMatches: [],
   impactedModules: null,
   estimationEffort: null,
   tdd: null,
@@ -225,6 +228,7 @@ export function SDLCProvider({ children }: SDLCProviderProps) {
             setPipeline(prev => ({
               ...prev,
               status: status ?? prev.status,
+              historicalMatches: (output.historical_matches as HistoricalMatchResult[]) ?? prev.historicalMatches,
               impactedModules: output.impacted_modules_output as ImpactedModulesOutput ?? prev.impactedModules,
               estimationEffort: output.estimation_effort_output as EstimationEffortOutput ?? prev.estimationEffort,
               tdd: output.tdd_output as TDDOutput ?? prev.tdd,
@@ -249,6 +253,7 @@ export function SDLCProvider({ children }: SDLCProviderProps) {
             ...prev,
             isRunning: false,
             status: status ?? 'completed',
+            historicalMatches: (output?.historical_matches as HistoricalMatchResult[]) ?? prev.historicalMatches,
             impactedModules: (output?.impacted_modules_output as ImpactedModulesOutput) ?? prev.impactedModules,
             estimationEffort: (output?.estimation_effort_output as EstimationEffortOutput) ?? prev.estimationEffort,
             tdd: (output?.tdd_output as TDDOutput) ?? prev.tdd,
@@ -293,8 +298,9 @@ export function SDLCProvider({ children }: SDLCProviderProps) {
       sessionId: response.session_id,
       status: response.status,
       error: response.error_message,
-      requirementText: '', // Not available in summary response
+      requirementText: response.requirement_text || '', // Not available in summary response
       jiraEpicId: '',
+      historicalMatches: response.historical_matches || [],
       impactedModules: response.impacted_modules_output,
       estimationEffort: response.estimation_effort_output,
       tdd: response.tdd_output,

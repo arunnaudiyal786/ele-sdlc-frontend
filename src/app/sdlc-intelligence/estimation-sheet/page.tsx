@@ -66,23 +66,66 @@ export default function EstimationSheetPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/10">
-            <Calculator className="h-5 w-5 text-green-500" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+            <Calculator className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-semibold tracking-tight">Estimation Sheet</h1>
-              <TechInfoBox {...TECH_INFO.estimation} />
-            </div>
+            <h1 className="text-2xl font-semibold tracking-tight">Estimation Sheet</h1>
             <p className="text-sm text-muted-foreground">
-              Effort breakdown and resource planning
+              AI-powered effort estimation using historical data patterns
             </p>
           </div>
         </div>
-        <Badge className={confidenceColor[estimation.confidence]}>
+        <Badge variant="secondary">
           {estimation.confidence} Confidence
         </Badge>
       </div>
+
+      {/* Algorithm Info Card */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="pt-4 pb-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Calculator className="h-4 w-4" />
+            </div>
+            <div className="flex-1 space-y-3">
+              <div>
+                <h3 className="text-base font-semibold mb-1">Estimation Algorithm</h3>
+                <p className="text-sm text-muted-foreground">
+                  Uses AI to analyze historical project data and complexity to generate accurate effort estimates
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-3 text-sm">
+                <div className="space-y-1">
+                  <div className="font-medium text-primary">AI Analysis</div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    LLM analyzes historical matches and impacted modules to calculate effort
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <div className="font-medium text-primary">Smart Breakdown</div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Automatically distributes hours across dev, QA, and story points by category
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <div className="font-medium text-primary">Confidence Score</div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Provides confidence level based on similarity to historical projects
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-primary/10 pt-3">
+                <p className="text-sm text-muted-foreground">
+                  <strong className="text-foreground">How it works:</strong> The AI examines similar past projects and impacted modules to estimate effort.
+                  It generates dev hours, QA hours, and story points with a category-wise breakdown.
+                  Higher confidence means more similar historical projects were found to base the estimate on.
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

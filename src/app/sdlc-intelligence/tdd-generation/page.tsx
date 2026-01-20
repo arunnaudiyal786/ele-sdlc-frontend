@@ -57,21 +57,64 @@ export default function TDDGenerationPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/10">
-            <FileCode className="h-5 w-5 text-green-500" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+            <FileCode className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-semibold tracking-tight">{tdd.tdd_name}</h1>
-              <TechInfoBox {...TECH_INFO.tdd} />
-            </div>
+            <h1 className="text-2xl font-semibold tracking-tight">{tdd.tdd_name}</h1>
             <p className="text-sm text-muted-foreground">
-              Technical Design Document
+              AI-generated Technical Design Document
             </p>
           </div>
         </div>
-        <Badge variant="outline">{tdd.architecture_pattern}</Badge>
+        <Badge variant="secondary">{tdd.architecture_pattern}</Badge>
       </div>
+
+      {/* Algorithm Info Card */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="pt-4 pb-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <FileCode className="h-4 w-4" />
+            </div>
+            <div className="flex-1 space-y-3">
+              <div>
+                <h3 className="text-base font-semibold mb-1">TDD Generation Algorithm</h3>
+                <p className="text-sm text-muted-foreground">
+                  Creates comprehensive technical design by learning from similar past implementations
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-3 text-sm">
+                <div className="space-y-1">
+                  <div className="font-medium text-primary">Pattern Learning</div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    AI analyzes architecture patterns from similar historical TDDs to suggest best approach
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <div className="font-medium text-primary">Tech Stack</div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Recommends components and dependencies based on proven past implementations
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <div className="font-medium text-primary">Design Decisions</div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Generates detailed design with security, performance, and scalability considerations
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-primary/10 pt-3">
+                <p className="text-sm text-muted-foreground">
+                  <strong className="text-foreground">How it works:</strong> The AI examines similar TDDs from historical matches and your requirement details.
+                  It suggests proven architecture patterns, technical components, and dependencies.
+                  The output includes design decisions, data flow, API contracts, and deployment considerations in a structured markdown format.
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Quick Info Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

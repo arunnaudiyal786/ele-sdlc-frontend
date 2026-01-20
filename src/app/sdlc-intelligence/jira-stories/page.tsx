@@ -73,23 +73,69 @@ export default function JiraStoriesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/10">
-            <ListTodo className="h-5 w-5 text-green-500" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+            <ListTodo className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-semibold tracking-tight">Jira Stories</h1>
-              <TechInfoBox {...TECH_INFO.jiraStories} />
-            </div>
+            <h1 className="text-2xl font-semibold tracking-tight">Jira Stories</h1>
             <p className="text-sm text-muted-foreground">
-              {jiraData.story_count} stories • {jiraData.total_story_points} story points
+              AI-decomposed user stories and tasks ready for your backlog
             </p>
           </div>
         </div>
+        <Badge variant="secondary">
+          {jiraData.story_count} stories
+        </Badge>
       </div>
 
+      {/* Algorithm Info Card */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="pt-4 pb-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <ListTodo className="h-4 w-4" />
+            </div>
+            <div className="flex-1 space-y-3">
+              <div>
+                <h3 className="text-base font-semibold mb-1">Jira Story Generation Algorithm</h3>
+                <p className="text-sm text-muted-foreground">
+                  Intelligently breaks down requirements into actionable user stories with acceptance criteria
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-3 text-sm">
+                <div className="space-y-1">
+                  <div className="font-medium text-primary">Smart Decomposition</div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    AI analyzes TDD and estimation to create Stories, Tasks, and Spikes based on work nature
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <div className="font-medium text-primary">Story Sizing</div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Automatically assigns story points aligned with effort estimation breakdown
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <div className="font-medium text-primary">Acceptance Criteria</div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Generates clear acceptance criteria derived from requirements and technical design
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-primary/10 pt-3">
+                <p className="text-sm text-muted-foreground">
+                  <strong className="text-foreground">How it works:</strong> The AI examines the TDD, estimation breakdown, and impacted modules to decompose work.
+                  It creates properly sized stories with descriptions, acceptance criteria, and priorities.
+                  Story types (Story/Task/Spike) are automatically determined based on the nature of work, and story points are distributed to match the effort estimate.
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <Card>
           <CardContent className="pt-6 text-center">
             <p className="text-3xl font-bold">{jiraData.story_count}</p>
@@ -100,18 +146,6 @@ export default function JiraStoriesPage() {
           <CardContent className="pt-6 text-center">
             <p className="text-3xl font-bold">{jiraData.total_story_points}</p>
             <p className="text-xs text-muted-foreground">Story Points</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <p className="text-3xl font-bold">{codeImpact?.total_files || 0}</p>
-            <p className="text-xs text-muted-foreground">Files Impacted</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <p className="text-3xl font-bold text-orange-500">{risks?.high_severity_count || 0}</p>
-            <p className="text-xs text-muted-foreground">High Risks</p>
           </CardContent>
         </Card>
       </div>

@@ -227,6 +227,7 @@ export interface AgentInfo {
 }
 
 // Agent list in execution order - matches backend AGENT_ORDER
+// Note: code_impact and risks agents are disabled
 export const AGENTS: AgentInfo[] = [
   { name: 'requirement', displayName: 'Extracting Keywords', description: 'Parsing requirement text' },
   { name: 'historical_match', displayName: 'Finding Historical Matches', description: 'Searching similar projects' },
@@ -235,6 +236,7 @@ export const AGENTS: AgentInfo[] = [
   { name: 'estimation_effort', displayName: 'Generating Estimation', description: 'Calculating effort hours' },
   { name: 'tdd', displayName: 'Creating TDD', description: 'Generating technical design' },
   { name: 'jira_stories', displayName: 'Generating Jira Stories', description: 'Creating user stories' },
-  { name: 'code_impact', displayName: 'Analyzing Code Impact', description: 'Identifying code changes' },
-  { name: 'risks', displayName: 'Assessing Risks', description: 'Evaluating project risks' },
+  // Disabled agents:
+  // { name: 'code_impact', displayName: 'Analyzing Code Impact', description: 'Identifying code changes' },
+  // { name: 'risks', displayName: 'Assessing Risks', description: 'Evaluating project risks' },
 ]

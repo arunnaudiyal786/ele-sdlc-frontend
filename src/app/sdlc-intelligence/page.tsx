@@ -248,7 +248,7 @@ export default function SDLCIntelligencePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Summary Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div className="rounded-lg border p-3 text-center">
                 <p className="text-2xl font-bold">
                   {pipeline.impactedModules?.total_modules || 0}
@@ -266,12 +266,6 @@ export default function SDLCIntelligencePage() {
                   {pipeline.jiraStories?.story_count || 0}
                 </p>
                 <p className="text-xs text-muted-foreground">Jira Stories</p>
-              </div>
-              <div className="rounded-lg border p-3 text-center">
-                <p className="text-2xl font-bold">
-                  {pipeline.risks?.total_risks || 0}
-                </p>
-                <p className="text-xs text-muted-foreground">Risks Identified</p>
               </div>
             </div>
 
