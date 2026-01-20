@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Brain, Loader2, AlertCircle, CheckCircle2, ArrowRight, FileText, Circle } from "lucide-react"
 import { useSDLC } from "@/contexts/sdlc-context"
 import { AGENTS } from "@/lib/api"
@@ -21,10 +21,20 @@ import { NoAssessmentState } from "@/components/sdlc/no-assessment-state"
 
 export default function SDLCIntelligencePage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { pipeline, streaming, runImpactPipeline, resetPipeline } = useSDLC()
   const [requirementText, setRequirementText] = React.useState('')
   const [jiraEpicId, setJiraEpicId] = React.useState('')
   const [showForm, setShowForm] = React.useState(false)
+
+  // Auto-show form if 'start' query parameter is present
+  React.useEffect(() => {
+    if (searchParams.get('start') === 'true') {
+      setShowForm(true)
+      // Clean up URL
+      router.replace('/sdlc-intelligence')
+    }
+  }, [searchParams, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -18,6 +18,9 @@ import {
   CheckCircle2,
   Zap,
   History,
+  FolderKanban,
+  Upload,
+  RefreshCw,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -74,6 +77,23 @@ const mainNavItems: NavItem[] = [
     title: "Data Engineering",
     url: "/data-engineering",
     icon: Database,
+    subItems: [
+      {
+        title: "Pipeline Jobs",
+        url: "/data-engineering",
+        icon: FolderKanban,
+      },
+      {
+        title: "New Pipeline",
+        url: "/data-engineering/pipeline/new",
+        icon: Upload,
+      },
+      {
+        title: "Batch Processing",
+        url: "/data-engineering/batch",
+        icon: RefreshCw,
+      },
+    ],
   },
   {
     title: "SDLC Intelligence",

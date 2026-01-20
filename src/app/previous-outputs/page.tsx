@@ -214,25 +214,25 @@ function EstimationSection({ data }: { data: PipelineResponse }) {
         </Badge>
       </div>
 
-      {/* Module Breakdown */}
-      {estimation.modules && estimation.modules.length > 0 && (
+      {/* Effort Breakdown */}
+      {estimation.breakdown && estimation.breakdown.length > 0 && (
         <div className="border rounded-md overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr>
-                <th className="text-left p-2 font-medium">Module</th>
+                <th className="text-left p-2 font-medium">Category</th>
                 <th className="text-right p-2 font-medium">Dev</th>
                 <th className="text-right p-2 font-medium">QA</th>
                 <th className="text-right p-2 font-medium">Total</th>
               </tr>
             </thead>
             <tbody>
-              {estimation.modules.map((mod, idx) => (
+              {estimation.breakdown.map((item, idx) => (
                 <tr key={idx} className="border-t">
-                  <td className="p-2">{mod.module_name}</td>
-                  <td className="text-right p-2">{mod.dev_hours}h</td>
-                  <td className="text-right p-2">{mod.qa_hours}h</td>
-                  <td className="text-right p-2 font-medium">{mod.total_hours}h</td>
+                  <td className="p-2">{item.category}</td>
+                  <td className="text-right p-2">{item.dev_hours}h</td>
+                  <td className="text-right p-2">{item.qa_hours}h</td>
+                  <td className="text-right p-2 font-medium">{item.dev_hours + item.qa_hours}h</td>
                 </tr>
               ))}
             </tbody>
@@ -279,7 +279,7 @@ function TDDSection({ data }: { data: PipelineResponse }) {
           <div className="flex flex-wrap gap-2">
             {tdd.technical_components.map((comp, idx) => (
               <Badge key={idx} variant="secondary" className="text-xs">
-                {typeof comp === 'string' ? comp : comp.name || comp.component_name}
+                {comp}
               </Badge>
             ))}
           </div>
@@ -293,7 +293,7 @@ function TDDSection({ data }: { data: PipelineResponse }) {
           <div className="flex flex-wrap gap-2">
             {tdd.tdd_dependencies.map((dep, idx) => (
               <Badge key={idx} variant="outline" className="text-xs font-mono">
-                {typeof dep === 'string' ? dep : dep.name || dep.dependency}
+                {dep}
               </Badge>
             ))}
           </div>
@@ -386,12 +386,12 @@ function CodeImpactSection({ data }: { data: PipelineResponse }) {
       {codeImpact.files.map((file, idx) => (
         <div key={idx} className="flex items-center gap-3 p-2 rounded-md bg-muted/30 border">
           <Code className="h-4 w-4 text-muted-foreground shrink-0" />
-          <span className="text-sm font-mono flex-1 truncate">{file.file_path || file.file_name}</span>
+          <span className="text-sm font-mono flex-1 truncate">{file.file_path}</span>
           <Badge
             variant="outline"
             className={`text-xs ${
-              file.change_type === 'NEW' ? 'bg-green-500/10 text-green-600 border-green-500/30' :
-              file.change_type === 'MODIFY' ? 'bg-blue-500/10 text-blue-600 border-blue-500/30' :
+              file.change_type === 'new' ? 'bg-green-500/10 text-green-600 border-green-500/30' :
+              file.change_type === 'modified' ? 'bg-blue-500/10 text-blue-600 border-blue-500/30' :
               'bg-red-500/10 text-red-600 border-red-500/30'
             }`}
           >

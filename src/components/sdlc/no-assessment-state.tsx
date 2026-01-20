@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Search, ArrowLeft, LucideIcon } from "lucide-react"
+import { Search, LucideIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -26,30 +26,31 @@ export function NoAssessmentState({
   asLink = false,
 }: NoAssessmentStateProps) {
   return (
-    <Card>
-      <CardContent className="flex flex-col items-center justify-center py-16">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-6">
-          <Icon className="h-8 w-8 text-muted-foreground/50" />
-        </div>
-        <p className="text-muted-foreground text-center mb-2">
-          {title}
-        </p>
-        <p className="text-muted-foreground text-center mb-6">
-          {description}
-        </p>
-        {asLink ? (
-          <Button asChild size="lg">
-            <Link href="/sdlc-intelligence">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+    <div className="flex justify-center pt-12">
+      <Card className="max-w-2xl w-full">
+        <CardContent className="flex flex-col items-center justify-center py-16">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-6">
+            <Icon className="h-8 w-8 text-muted-foreground/50" />
+          </div>
+          <p className="text-muted-foreground text-center mb-2">
+            {title}
+          </p>
+          <p className="text-muted-foreground text-center mb-6">
+            {description}
+          </p>
+          {asLink ? (
+            <Button asChild size="lg">
+              <Link href="/sdlc-intelligence?start=true">
+                Start Assessment
+              </Link>
+            </Button>
+          ) : (
+            <Button onClick={onStartAssessment} size="lg">
               Start Assessment
-            </Link>
-          </Button>
-        ) : (
-          <Button onClick={onStartAssessment} size="lg">
-            Start Assessment
-          </Button>
-        )}
-      </CardContent>
-    </Card>
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   )
 }
