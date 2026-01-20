@@ -97,19 +97,19 @@ export default function EstimationSheetPage() {
               </div>
               <div className="grid grid-cols-3 gap-3 text-sm">
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">AI Analysis</div>
+                  <div className="font-bold text-primary">AI Analysis</div>
                   <p className="text-muted-foreground leading-relaxed">
                     LLM analyzes historical matches and impacted modules to calculate effort
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">Smart Breakdown</div>
+                  <div className="font-bold text-primary">Smart Breakdown</div>
                   <p className="text-muted-foreground leading-relaxed">
                     Automatically distributes hours across dev, QA, and story points by category
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">Confidence Score</div>
+                  <div className="font-bold text-primary">Confidence Score</div>
                   <p className="text-muted-foreground leading-relaxed">
                     Provides confidence level based on similarity to historical projects
                   </p>
@@ -259,7 +259,7 @@ export default function EstimationSheetPage() {
                     <p className="font-medium text-sm">{mod.name}</p>
                     <p className="text-xs text-muted-foreground mt-1">{mod.reason}</p>
                   </div>
-                  <Badge variant={mod.impact === 'HIGH' ? 'destructive' : mod.impact === 'MEDIUM' ? 'default' : 'secondary'}>
+                  <Badge variant={mod.impact === 'HIGH' ? 'default' : mod.impact === 'MEDIUM' ? 'secondary' : 'outline'} className={mod.impact === 'HIGH' ? 'bg-orange-500/10 text-orange-600 border-orange-500/20' : ''}>
                     {mod.impact}
                   </Badge>
                 </div>
@@ -282,7 +282,7 @@ export default function EstimationSheetPage() {
                     <p className="font-medium text-sm">{mod.name}</p>
                     <p className="text-xs text-muted-foreground mt-1">{mod.reason}</p>
                   </div>
-                  <Badge variant={mod.impact === 'HIGH' ? 'destructive' : mod.impact === 'MEDIUM' ? 'default' : 'secondary'}>
+                  <Badge variant={mod.impact === 'HIGH' ? 'default' : mod.impact === 'MEDIUM' ? 'secondary' : 'outline'} className={mod.impact === 'HIGH' ? 'bg-orange-500/10 text-orange-600 border-orange-500/20' : ''}>
                     {mod.impact}
                   </Badge>
                 </div>

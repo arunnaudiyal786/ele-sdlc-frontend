@@ -61,7 +61,7 @@ export default function TDDGenerationPage() {
             <FileCode className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{tdd.tdd_name}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">TDD Generation</h1>
             <p className="text-sm text-muted-foreground">
               AI-generated Technical Design Document
             </p>
@@ -86,19 +86,19 @@ export default function TDDGenerationPage() {
               </div>
               <div className="grid grid-cols-3 gap-3 text-sm">
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">Pattern Learning</div>
+                  <div className="font-bold text-primary">Pattern Learning</div>
                   <p className="text-muted-foreground leading-relaxed">
                     AI analyzes architecture patterns from similar historical TDDs to suggest best approach
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">Tech Stack</div>
+                  <div className="font-bold text-primary">Tech Stack</div>
                   <p className="text-muted-foreground leading-relaxed">
                     Recommends components and dependencies based on proven past implementations
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">Design Decisions</div>
+                  <div className="font-bold text-primary">Design Decisions</div>
                   <p className="text-muted-foreground leading-relaxed">
                     Generates detailed design with security, performance, and scalability considerations
                   </p>

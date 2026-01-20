@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ImpactHub - AI Impact Assessment System",
+  title: "SDLC Intelligence Tool - AI Impact Assessment System",
   description: "AI-powered impact assessment for SDLC projects",
 };
 

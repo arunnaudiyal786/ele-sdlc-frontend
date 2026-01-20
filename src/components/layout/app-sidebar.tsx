@@ -258,7 +258,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <Zap className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="text-lg font-semibold text-foreground">
-            ImpactHub
+            SDLC Intelligence Tool
           </span>
         </Link>
       </SidebarHeader>

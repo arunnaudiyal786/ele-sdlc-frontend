@@ -104,19 +104,19 @@ export default function JiraStoriesPage() {
               </div>
               <div className="grid grid-cols-3 gap-3 text-sm">
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">Smart Decomposition</div>
+                  <div className="font-bold text-primary">Smart Decomposition</div>
                   <p className="text-muted-foreground leading-relaxed">
                     AI analyzes TDD and estimation to create Stories, Tasks, and Spikes based on work nature
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">Story Sizing</div>
+                  <div className="font-bold text-primary">Story Sizing</div>
                   <p className="text-muted-foreground leading-relaxed">
                     Automatically assigns story points aligned with effort estimation breakdown
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">Acceptance Criteria</div>
+                  <div className="font-bold text-primary">Acceptance Criteria</div>
                   <p className="text-muted-foreground leading-relaxed">
                     Generates clear acceptance criteria derived from requirements and technical design
                   </p>

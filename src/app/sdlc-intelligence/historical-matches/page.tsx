@@ -95,19 +95,19 @@ export default function HistoricalMatchesPage() {
               </div>
               <div className="grid grid-cols-3 gap-3 text-sm">
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">Semantic 70%</div>
+                  <div className="font-bold text-primary">Semantic 70%</div>
                   <p className="text-muted-foreground leading-relaxed">
                     AI understands the meaning and context of your requirement using vector embeddings
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">Keyword 30%</div>
+                  <div className="font-bold text-primary">Keyword 30%</div>
                   <p className="text-muted-foreground leading-relaxed">
                     Matches specific technical terms and important keywords from your requirement
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-medium text-primary">RRF Fusion</div>
+                  <div className="font-bold text-primary">RRF Fusion</div>
                   <p className="text-muted-foreground leading-relaxed">
                     Combines both scores using Reciprocal Rank Fusion to rank the best matches
                   </p>
@@ -142,7 +142,7 @@ export default function HistoricalMatchesPage() {
       </div>
 
       {/* Requirement Context */}
-      <Card>
+      <Card className="border-l-4 border-l-primary bg-primary/5">
         <CardHeader>
           <CardTitle>Input Requirement</CardTitle>
           <CardDescription>
@@ -150,7 +150,7 @@ export default function HistoricalMatchesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">
             {pipeline.requirementText || 'No requirement text available'}
           </p>
           {pipeline.jiraEpicId && (

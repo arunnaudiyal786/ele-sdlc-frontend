@@ -17,10 +17,10 @@ import type {
 // Current user
 export const currentUser: User = {
   id: 'user-1',
-  name: 'Markus Chen',
-  email: 'markus.chen@elevance.com',
-  avatar: '/avatars/markus.jpg',
-  role: 'analyst',
+  name: 'Arun Naudiyal',
+  email: 'arun.naudiyal@elevance.com',
+  avatar: '/avatars/arun.jpg',
+  role: 'Senior Consultant',
 };
 
 // Dashboard Statistics
