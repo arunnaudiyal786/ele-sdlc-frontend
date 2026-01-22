@@ -53,10 +53,12 @@ export default function ExtractPage() {
   return (
     <div className="space-y-6">
       {/* Files summary */}
-      <Card className="border-slate-800 bg-slate-900/50">
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <FileSearch className="h-5 w-5 text-cyan-400" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 dark:bg-cyan-500/20">
+              <FileSearch className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+            </div>
             Uploaded Files
           </CardTitle>
         </CardHeader>
@@ -65,11 +67,11 @@ export default function ExtractPage() {
             {uploadedFiles.map(file => (
               <div
                 key={file.filename}
-                className="flex items-center gap-2 rounded-lg bg-slate-800 px-3 py-2"
+                className="flex items-center gap-2 rounded-lg bg-muted/50 border px-4 py-2.5 shadow-sm"
               >
-                <span className="text-sm text-slate-300">{file.filename}</span>
-                <span className="text-xs text-slate-500 capitalize">
-                  ({file.document_type})
+                <span className="text-sm font-medium">{file.filename}</span>
+                <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-md bg-muted capitalize border">
+                  {file.document_type}
                 </span>
               </div>
             ))}
@@ -79,10 +81,12 @@ export default function ExtractPage() {
 
       {/* Extraction options */}
       {!hasResults && (
-        <Card className="border-slate-800 bg-slate-900/50">
+        <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Settings2 className="h-5 w-5 text-violet-400" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 dark:bg-violet-500/20">
+                <Settings2 className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+              </div>
               Extraction Options
             </CardTitle>
             <CardDescription>
@@ -91,16 +95,16 @@ export default function ExtractPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* LLM Enhancement toggle */}
-            <div className="flex items-center justify-between rounded-lg bg-slate-800/50 p-4">
+            <div className="flex items-center justify-between rounded-lg bg-muted/50 border p-4 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/20">
-                  <Sparkles className="h-5 w-5 text-violet-400" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10 dark:bg-violet-500/20">
+                  <Sparkles className="h-5 w-5 text-violet-600 dark:text-violet-400" />
                 </div>
                 <div>
-                  <Label htmlFor="llm-enhancement" className="text-slate-200">
+                  <Label htmlFor="llm-enhancement">
                     LLM Enhancement
                   </Label>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     Use AI to improve extraction for low-confidence fields
                   </p>
                 </div>
@@ -116,10 +120,10 @@ export default function ExtractPage() {
             {useLlmEnhancement && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <Label className="text-slate-200">
+                  <Label>
                     LLM Trigger Threshold
                   </Label>
-                  <span className="text-sm font-mono text-cyan-400">
+                  <span className="text-sm font-mono text-cyan-600 dark:text-cyan-400 font-medium">
                     {Math.round(confidenceThreshold[0] * 100)}%
                   </span>
                 </div>
@@ -131,7 +135,7 @@ export default function ExtractPage() {
                   step={0.1}
                   className="w-full"
                 />
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Fields with confidence below this threshold will be enhanced using AI
                 </p>
               </div>
@@ -165,8 +169,8 @@ export default function ExtractPage() {
       {/* Error message */}
       {error && (
         <div className="flex items-center gap-2 rounded-lg bg-rose-500/10 border border-rose-500/30 p-4">
-          <AlertCircle className="h-5 w-5 text-rose-400 shrink-0" />
-          <p className="text-sm text-rose-300">{error}</p>
+          <AlertCircle className="h-5 w-5 text-rose-600 dark:text-rose-400 shrink-0" />
+          <p className="text-sm text-rose-700 dark:text-rose-300">{error}</p>
         </div>
       )}
 

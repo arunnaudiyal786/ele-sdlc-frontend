@@ -1,0 +1,572 @@
+{
+  "system": {
+    "name": "AI Impact Assessment System",
+    "organization": "Elevance Health",
+    "purpose": "Automated software requirement impact assessment",
+    "version": "1.0",
+    "generated_date": "2026-01-20"
+  },
+  "architecture": {
+    "components": [
+      {
+        "name": "Frontend",
+        "technology": "Next.js 16 + React 19",
+        "port": 3000,
+        "purpose": "User interface and wizard flow"
+      },
+      {
+        "name": "Backend",
+        "technology": "FastAPI + LangGraph",
+        "port": 8000,
+        "purpose": "API server and agent orchestration"
+      },
+      {
+        "name": "Vector Database",
+        "technology": "ChromaDB",
+        "port": null,
+        "purpose": "Semantic search and embeddings storage"
+      },
+      {
+        "name": "LLM Runtime",
+        "technology": "Ollama",
+        "port": 11434,
+        "purpose": "Local LLM inference (phi3:mini, all-minilm)"
+      }
+    ]
+  },
+  "pipeline": {
+    "workflow_name": "Impact Assessment Pipeline",
+    "orchestration": "LangGraph StateGraph",
+    "total_agents": 7,
+    "disabled_agents": 2,
+    "agents": [
+      {
+        "id": 1,
+        "name": "Requirement Analysis Agent",
+        "status": "active",
+        "file": "app/components/requirement/agent.py",
+        "model": "phi3:mini",
+        "purpose": "Extract keywords from requirement text using NLP",
+        "input": {
+          "requirement_text": "string",
+          "jira_epic_id": "string (optional)"
+        },
+        "output": {
+          "extracted_keywords": "List[string]"
+        },
+        "processing_steps": [
+          "Normalize and clean requirement text",
+          "Send to Ollama LLM with extraction prompt",
+          "Parse JSON response",
+          "Extract list of technical keywords"
+        ],
+        "state_updates": {
+          "extracted_keywords": "List of keywords",
+          "status": "requirement_submitted",
+          "current_agent": "historical_match"
+        },
+        "typical_time_ms": 1500
+      },
+      {
+        "id": 2,
+        "name": "Historical Match Agent",
+        "status": "active",
+        "file": "app/components/historical_match/agent.py",
+        "model": "all-minilm (embeddings)",
+        "purpose": "Find similar past requirements via hybrid search",
+        "input": {
+          "requirement_text": "string",
+          "extracted_keywords": "List[string]"
+        },
+        "output": {
+          "all_matches": "List[Match]",
+          "score_breakdown": "semantic + keyword scores"
+        },
+        "search_strategy": {
+          "semantic_search": {
+            "weight": 0.7,
+            "method": "Vector similarity (cosine)",
+            "model": "all-minilm",
+            "dimensions": 384
+          },
+          "keyword_search": {
+            "weight": 0.3,
+            "method": "BM25 algorithm",
+            "fields": "text content"
+          },
+          "collections": ["epics", "estimations", "tdds"]
+        },
+        "processing_steps": [
+          "Generate embedding for requirement + keywords",
+          "Query ChromaDB with semantic search (70%)",
+          "Query ChromaDB with keyword search (30%)",
+          "Fuse scores: final = 0.7*semantic + 0.3*keyword",
+          "Sort by final score descending"
+        ],
+        "state_updates": {
+          "all_matches": "List of ranked matches",
+          "status": "matches_found",
+          "current_agent": "auto_select"
+        },
+        "typical_time_ms": 3500
+      },
+      {
+        "id": 3,
+        "name": "Auto-Select Node",
+        "status": "active",
+        "file": "app/components/orchestrator/workflow.py",
+        "model": null,
+        "purpose": "Automatically select top 5 matches or use pre-selected",
+        "input": {
+          "all_matches": "List[Match]",
+          "selected_matches": "List[Match] (optional)"
+        },
+        "output": {
+          "selected_matches": "List[Match] (top 5)"
+        },
+        "logic": {
+          "if_preselected": "Pass through pre-selected matches",
+          "if_empty": "Sort by score, take top 5"
+        },
+        "processing_steps": [
+          "Check if matches already selected",
+          "If yes: use pre-selected (manual mode)",
+          "If no: sort by score descending, take top 5",
+          "Enable automated pipeline execution"
+        ],
+        "state_updates": {
+          "selected_matches": "Top 5 matches",
+          "status": "matches_selected",
+          "current_agent": "impacted_modules"
+        },
+        "typical_time_ms": 75
+      },
+      {
+        "id": 4,
+        "name": "Impacted Modules Agent",
+        "status": "active",
+        "file": "app/components/impacted_modules/agent.py",
+        "model": "phi3:mini",
+        "purpose": "Identify system modules affected by requirement",
+        "input": {
+          "requirement_text": "string",
+          "selected_matches": "List[Match]"
+        },
+        "output": {
+          "modules": "List[Module with impact level]"
+        },
+        "module_analysis": {
+          "fields": ["name", "impact_level", "description"],
+          "impact_levels": ["High", "Medium", "Low"]
+        },
+        "processing_steps": [
+          "Gather requirement + historical module data",
+          "Build LLM prompt for module identification",
+          "Call Ollama phi3:mini",
+          "Parse JSON response with parse_llm_json()",
+          "Validate module structure"
+        ],
+        "state_updates": {
+          "impacted_modules_output": "Module impact data",
+          "status": "impacted_modules_generated",
+          "current_agent": "estimation_effort"
+        },
+        "typical_time_ms": 5500
+      },
+      {
+        "id": 5,
+        "name": "Estimation Effort Agent",
+        "status": "active",
+        "file": "app/components/estimation_effort/agent.py",
+        "model": "phi3:mini",
+        "purpose": "Calculate development and QA effort estimates",
+        "input": {
+          "requirement_text": "string",
+          "impacted_modules": "List[Module]",
+          "selected_matches": "List[Match]"
+        },
+        "output": {
+          "dev_effort_hours": "float",
+          "qa_effort_hours": "float",
+          "total_effort_hours": "float",
+          "story_points": "int",
+          "complexity": "Small|Medium|Large",
+          "risk_level": "Low|Medium|High"
+        },
+        "estimation_method": "Historical analysis + LLM prediction",
+        "processing_steps": [
+          "Analyze complexity from requirement + modules",
+          "Retrieve similar past estimations",
+          "Calculate averages and adjustments",
+          "Generate estimates via LLM",
+          "Validate: total = dev + qa"
+        ],
+        "state_updates": {
+          "estimation_effort_output": "Effort estimates",
+          "status": "estimation_effort_completed",
+          "current_agent": "tdd"
+        },
+        "typical_time_ms": 4200
+      },
+      {
+        "id": 6,
+        "name": "Technical Design Document Agent",
+        "status": "active",
+        "file": "app/components/tdd/agent.py",
+        "model": "phi3:mini",
+        "purpose": "Generate comprehensive technical design documentation",
+        "input": {
+          "requirement_text": "string",
+          "impacted_modules": "List[Module]",
+          "estimation_effort": "Estimation",
+          "selected_matches": "List[Match]"
+        },
+        "output": {
+          "tdd_name": "string",
+          "tdd_description": "string",
+          "technical_components": "List[string]",
+          "architecture_pattern": "string",
+          "design_decisions": "string",
+          "dependencies": "List[string]",
+          "security_considerations": "string",
+          "performance_requirements": "string"
+        },
+        "tdd_sections": [
+          "Executive Summary",
+          "Technical Components",
+          "Architecture Pattern",
+          "Design Decisions",
+          "Dependencies",
+          "Security Considerations",
+          "Performance Requirements"
+        ],
+        "processing_steps": [
+          "Gather comprehensive context",
+          "Build detailed TDD prompt with all sections",
+          "Call Ollama with long-form generation",
+          "Parse markdown output",
+          "Save to file: sessions/{date}/{id}/agent_tdd/tdd.md",
+          "Extract structured fields"
+        ],
+        "state_updates": {
+          "tdd_output": "TDD structured data",
+          "status": "tdd_generated",
+          "current_agent": "jira_stories"
+        },
+        "typical_time_ms": 9000
+      },
+      {
+        "id": 7,
+        "name": "Jira Stories Agent",
+        "status": "active",
+        "file": "app/components/jira_stories/agent.py",
+        "model": "phi3:mini",
+        "purpose": "Generate actionable Jira user stories and tasks",
+        "input": {
+          "requirement_text": "string",
+          "impacted_modules": "List[Module]",
+          "estimation_effort": "Estimation",
+          "selected_matches": "List[Match]"
+        },
+        "output": {
+          "stories": "List[Story]",
+          "total_stories": "int",
+          "total_story_points": "int"
+        },
+        "story_structure": {
+          "fields": [
+            "story_title",
+            "description",
+            "acceptance_criteria",
+            "story_points",
+            "priority",
+            "labels",
+            "issue_type"
+          ],
+          "priorities": ["Critical", "High", "Medium", "Low"],
+          "issue_types": ["Story", "Task", "Sub-task", "Bug"]
+        },
+        "processing_steps": [
+          "Break down requirement into user stories",
+          "Use impacted modules as guide",
+          "Reference effort estimates for sizing",
+          "Generate acceptance criteria (Given/When/Then)",
+          "Assign story points and priority",
+          "Create sub-tasks where appropriate"
+        ],
+        "state_updates": {
+          "jira_stories_output": "Jira stories data",
+          "status": "jira_stories_generated",
+          "current_agent": "done"
+        },
+        "typical_time_ms": 6100
+      },
+      {
+        "id": 8,
+        "name": "Code Impact Agent",
+        "status": "disabled",
+        "file": "app/components/code_impact/agent.py",
+        "model": "phi3:mini",
+        "purpose": "Analyze impact on existing codebase",
+        "reason_disabled": "Requires GitLab API integration (not yet implemented)",
+        "planned_features": [
+          "Analyze GitLab repository structure",
+          "Identify affected files and functions",
+          "Estimate code changes required",
+          "Assess backward compatibility risks"
+        ],
+        "future_activation": "Phase 2 - After GitLab integration"
+      },
+      {
+        "id": 9,
+        "name": "Risk Assessment Agent",
+        "status": "disabled",
+        "file": "app/components/risks/agent.py",
+        "model": "phi3:mini",
+        "purpose": "Identify risks and mitigation strategies",
+        "reason_disabled": "Requires project management data integration",
+        "planned_features": [
+          "Identify technical risks",
+          "Assess timeline/schedule risks",
+          "Evaluate resource availability",
+          "Generate mitigation strategies",
+          "Create risk matrix (probability × impact)"
+        ],
+        "future_activation": "Phase 2 - After PM integration"
+      }
+    ]
+  },
+  "state_management": {
+    "state_schema": "ImpactAssessmentState (TypedDict)",
+    "file": "app/components/orchestrator/state.py",
+    "pattern": "Partial state updates (LangGraph auto-merge)",
+    "fields": {
+      "session_context": [
+        "session_id",
+        "requirement_text",
+        "jira_epic_id",
+        "extracted_keywords"
+      ],
+      "search_results": [
+        "all_matches",
+        "selected_matches"
+      ],
+      "agent_outputs": [
+        "impacted_modules_output",
+        "estimation_effort_output",
+        "tdd_output",
+        "jira_stories_output",
+        "code_impact_output",
+        "risks_output"
+      ],
+      "control_fields": [
+        "status",
+        "current_agent",
+        "error_message"
+      ],
+      "audit_fields": [
+        "timing",
+        "messages"
+      ]
+    },
+    "status_progression": [
+      "created",
+      "requirement_submitted",
+      "matches_found",
+      "matches_selected",
+      "impacted_modules_generated",
+      "estimation_effort_completed",
+      "tdd_generated",
+      "jira_stories_generated",
+      "completed"
+    ]
+  },
+  "data_storage": {
+    "vector_database": {
+      "type": "ChromaDB",
+      "location": "data/chroma/",
+      "collections": [
+        {
+          "name": "epics",
+          "documents": "Epic descriptions",
+          "metadata": "epic_id, epic_name, req_id, jira_id, etc."
+        },
+        {
+          "name": "estimations",
+          "documents": "Task descriptions",
+          "metadata": "dev_est_id, epic_id, module_id, etc."
+        },
+        {
+          "name": "tdds",
+          "documents": "TDD descriptions",
+          "metadata": "tdd_id, epic_id, dev_est_id, etc."
+        }
+      ]
+    },
+    "session_storage": {
+      "base_path": "sessions/{date}/{session_id}/",
+      "directories": [
+        "step1_input/",
+        "step2_search/",
+        "step3_agents/agent_impacted_modules/",
+        "step3_agents/agent_estimation_effort/",
+        "step3_agents/agent_tdd/",
+        "step3_agents/agent_jira_stories/"
+      ],
+      "files": [
+        "requirement.json",
+        "extracted_keywords.json",
+        "all_matches.json",
+        "selected_matches.json",
+        "input_prompt.txt",
+        "raw_response.txt",
+        "parsed_output.json",
+        "tdd.md",
+        "final_summary.json"
+      ]
+    },
+    "source_data": {
+      "location": "data/raw/",
+      "files": [
+        "epics.csv",
+        "estimations.csv",
+        "tdds.csv",
+        "stories_tasks.csv",
+        "gitlab_code.json"
+      ]
+    }
+  },
+  "api_endpoints": {
+    "base_url": "http://localhost:8000/api/v1",
+    "endpoints": [
+      {
+        "method": "POST",
+        "path": "/orchestrator/run",
+        "purpose": "Execute full pipeline",
+        "body": {
+          "session_id": "string",
+          "requirement_text": "string",
+          "jira_epic_id": "string (optional)"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/orchestrator/run-from-file",
+        "purpose": "Pipeline from uploaded file",
+        "body": {
+          "file": "multipart/form-data"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/sessions",
+        "purpose": "Create new session"
+      },
+      {
+        "method": "POST",
+        "path": "/sessions/{id}/requirements",
+        "purpose": "Submit requirement"
+      },
+      {
+        "method": "POST",
+        "path": "/sessions/{id}/historical-matches",
+        "purpose": "Search historical data"
+      },
+      {
+        "method": "POST",
+        "path": "/sessions/{id}/select-matches",
+        "purpose": "Select matches for analysis"
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "purpose": "Health check (includes Ollama status)"
+      },
+      {
+        "method": "GET",
+        "path": "/config",
+        "purpose": "Current configuration"
+      }
+    ]
+  },
+  "frontend_integration": {
+    "framework": "Next.js 16 (App Router)",
+    "ui_library": "React 19",
+    "styling": "Tailwind CSS v4 + shadcn/ui",
+    "state_management": {
+      "contexts": [
+        {
+          "name": "SDLCContext",
+          "file": "contexts/sdlc-context.tsx",
+          "purpose": "Pipeline execution state, agent outputs"
+        },
+        {
+          "name": "WizardContext",
+          "file": "contexts/wizard-context.tsx",
+          "purpose": "Wizard navigation, step tracking"
+        }
+      ]
+    },
+    "agent_tracking": {
+      "file": "lib/api/types.ts",
+      "agents_array": [
+        "requirement",
+        "historical_match",
+        "auto_select",
+        "impacted_modules",
+        "estimation_effort",
+        "tdd",
+        "jira_stories"
+      ],
+      "note": "Must match backend agent order"
+    }
+  },
+  "performance": {
+    "typical_pipeline_time": {
+      "min_seconds": 22,
+      "max_seconds": 40,
+      "average_seconds": 31
+    },
+    "agent_timings": [
+      {"agent": "requirement", "min_ms": 1000, "max_ms": 2000},
+      {"agent": "historical_match", "min_ms": 2000, "max_ms": 5000},
+      {"agent": "auto_select", "min_ms": 50, "max_ms": 100},
+      {"agent": "impacted_modules", "min_ms": 4000, "max_ms": 7000},
+      {"agent": "estimation_effort", "min_ms": 3000, "max_ms": 5000},
+      {"agent": "tdd", "min_ms": 7000, "max_ms": 12000},
+      {"agent": "jira_stories", "min_ms": 5000, "max_ms": 8000}
+    ]
+  },
+  "models": {
+    "llm": {
+      "name": "phi3:mini",
+      "provider": "Ollama",
+      "purpose": "Text generation (all agents)",
+      "context_window": "4K tokens",
+      "local": true
+    },
+    "embeddings": {
+      "name": "all-minilm",
+      "provider": "Ollama",
+      "purpose": "Vector embeddings for semantic search",
+      "dimensions": 384,
+      "local": true
+    }
+  },
+  "deployment": {
+    "development": {
+      "backend_start": "./start_dev.sh",
+      "frontend_start": "npm run dev",
+      "full_stack_start": "./start.sh (from polyrepo root)"
+    },
+    "ports": {
+      "frontend": 3000,
+      "backend": 8000,
+      "ollama": 11434
+    },
+    "dependencies": {
+      "backend": ["Python 3.10+", "Ollama", "ChromaDB"],
+      "frontend": ["Node.js", "npm"]
+    }
+  }
+}

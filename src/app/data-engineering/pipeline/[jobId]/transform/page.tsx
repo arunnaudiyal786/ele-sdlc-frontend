@@ -99,10 +99,12 @@ export default function TransformPage() {
     <div className="space-y-6">
       {/* Transform action card */}
       {!isTransformed && (
-        <Card className="border-slate-800 bg-slate-900/50">
+        <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <RefreshCw className="h-5 w-5 text-cyan-400" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 dark:bg-cyan-500/20">
+                <RefreshCw className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+              </div>
               Transform Data
             </CardTitle>
             <CardDescription>
@@ -111,15 +113,15 @@ export default function TransformPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Mapping summary */}
-            <div className="rounded-lg bg-slate-800/50 p-4">
-              <h4 className="text-sm font-medium text-slate-300 mb-3">Mappings to Apply</h4>
+            <div className="rounded-lg bg-muted/50 border p-4 shadow-sm">
+              <h4 className="text-sm font-medium mb-3">Mappings to Apply</h4>
               <div className="flex flex-wrap gap-3">
                 {entitiesWithData.map(entity => (
                   <div
                     key={entity}
-                    className="flex items-center gap-2 rounded-lg bg-slate-700/50 px-3 py-2"
+                    className="flex items-center gap-2 rounded-lg bg-muted border px-4 py-2 shadow-sm"
                   >
-                    <span className="text-sm text-slate-300 capitalize">{entity}</span>
+                    <span className="text-sm font-medium capitalize">{entity}</span>
                     <Badge variant="outline" className="text-xs">
                       {Object.keys(appliedMappings[entity] || {}).length} fields
                     </Badge>
@@ -156,8 +158,8 @@ export default function TransformPage() {
       {/* Error message */}
       {error && (
         <div className="flex items-center gap-2 rounded-lg bg-rose-500/10 border border-rose-500/30 p-4">
-          <AlertCircle className="h-5 w-5 text-rose-400 shrink-0" />
-          <p className="text-sm text-rose-300">{error}</p>
+          <AlertCircle className="h-5 w-5 text-rose-600 dark:text-rose-400 shrink-0" />
+          <p className="text-sm text-rose-700 dark:text-rose-300">{error}</p>
         </div>
       )}
 
@@ -165,15 +167,15 @@ export default function TransformPage() {
       {isTransformed && (
         <>
           {/* Summary card */}
-          <Card className="border-emerald-500/30 bg-emerald-500/5">
+          <Card className="border-green-500/30 bg-green-500/5 shadow-sm">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20">
-                  <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/20 shadow-lg shadow-green-500/20">
+                  <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-emerald-400">Transformation Complete</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-green-700 dark:text-green-400">Transformation Complete</CardTitle>
+                  <CardDescription className="text-green-600 dark:text-green-300/60">
                     {totalRecords} total records created across {entitiesWithData.length} entities
                   </CardDescription>
                 </div>
@@ -185,14 +187,14 @@ export default function TransformPage() {
                   <div
                     key={entity}
                     className={cn(
-                      "rounded-lg p-3 text-center",
+                      "rounded-lg p-3 text-center border shadow-sm",
                       recordCounts[entity] > 0
-                        ? "bg-emerald-500/10 border border-emerald-500/30"
-                        : "bg-slate-800/50 border border-slate-700"
+                        ? "bg-green-500/10 border-green-500/30"
+                        : "bg-muted/30 border"
                     )}
                   >
-                    <p className="text-2xl font-bold text-slate-100">{recordCounts[entity]}</p>
-                    <p className="text-xs text-slate-500 capitalize">{entity}s</p>
+                    <p className="text-2xl font-bold">{recordCounts[entity]}</p>
+                    <p className="text-xs text-muted-foreground capitalize font-medium">{entity}s</p>
                   </div>
                 ))}
               </div>
@@ -250,10 +252,12 @@ export default function TransformPage() {
           )}
 
           {/* Data preview tabs */}
-          <Card className="border-slate-800 bg-slate-900/50">
+          <Card className="shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Table className="h-5 w-5 text-cyan-400" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 dark:bg-cyan-500/20">
+                  <Table className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+                </div>
                 Data Preview
               </CardTitle>
               <CardDescription>

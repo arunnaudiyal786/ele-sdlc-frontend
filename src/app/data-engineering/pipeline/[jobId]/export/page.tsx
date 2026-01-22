@@ -71,7 +71,7 @@ export default function ExportPage() {
 
       {/* Next steps */}
       {isExported && (
-        <Card className="border-slate-800 bg-slate-900/50">
+        <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="text-base">Next Steps</CardTitle>
             <CardDescription>
@@ -99,10 +99,12 @@ export default function ExportPage() {
 
       {/* Pre-export summary */}
       {!isExported && (
-        <Card className="border-slate-800 bg-slate-900/50">
+        <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Download className="h-5 w-5 text-cyan-400" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 dark:bg-cyan-500/20">
+                <Download className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+              </div>
               Ready to Export
             </CardTitle>
             <CardDescription>
@@ -110,23 +112,23 @@ export default function ExportPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="rounded-lg bg-slate-800/50 p-4">
-              <h4 className="text-sm font-medium text-slate-300 mb-3">Data Summary</h4>
+            <div className="rounded-lg bg-muted/50 border p-4 shadow-sm">
+              <h4 className="text-sm font-medium mb-3">Data Summary</h4>
               <div className="grid gap-3 md:grid-cols-4">
                 {(['epic', 'estimation', 'tdd', 'story'] as EntityType[]).map(entity => (
                   <div
                     key={entity}
-                    className="rounded-lg bg-slate-700/50 p-3 text-center"
+                    className="rounded-lg bg-muted border p-3 text-center shadow-sm"
                   >
-                    <p className="text-xl font-bold text-slate-100">
+                    <p className="text-xl font-bold">
                       {transformedData[entity]?.length || 0}
                     </p>
-                    <p className="text-xs text-slate-500 capitalize">{entity}s</p>
+                    <p className="text-xs text-muted-foreground capitalize font-medium">{entity}s</p>
                   </div>
                 ))}
               </div>
-              <p className="mt-4 text-sm text-slate-400 text-center">
-                Total: <span className="font-semibold text-slate-200">{totalRecords}</span> records ready for export
+              <p className="mt-4 text-sm text-muted-foreground text-center">
+                Total: <span className="font-semibold">{totalRecords}</span> records ready for export
               </p>
             </div>
           </CardContent>
@@ -147,14 +149,14 @@ function NextStepCard({ title, description, icon: Icon, href }: NextStepCardProp
   return (
     <Link
       href={href}
-      className="flex items-center gap-4 rounded-lg border border-slate-800 bg-slate-800/30 p-4 transition-all hover:border-cyan-500/50 hover:bg-slate-800/50"
+      className="flex items-center gap-4 rounded-lg border bg-muted/30 p-4 shadow-sm transition-all hover:border-cyan-500/50 hover:bg-muted/50 hover:shadow-md"
     >
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-cyan-500/20">
-        <Icon className="h-6 w-6 text-cyan-400" />
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 dark:bg-cyan-500/20 shadow-sm">
+        <Icon className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
       </div>
       <div>
-        <h4 className="font-medium text-slate-200">{title}</h4>
-        <p className="text-sm text-slate-500">{description}</p>
+        <h4 className="font-medium">{title}</h4>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
     </Link>
   )

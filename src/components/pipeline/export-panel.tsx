@@ -45,10 +45,12 @@ export function ExportPanel({
     <div className={cn("space-y-6", className)}>
       {/* Export action card */}
       {!hasExported && (
-        <Card className="border-slate-800 bg-slate-900/50">
+        <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Download className="h-5 w-5 text-cyan-400" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 dark:bg-cyan-500/20">
+                <Download className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+              </div>
               Export Data
             </CardTitle>
             <CardDescription>
@@ -80,15 +82,15 @@ export function ExportPanel({
 
       {/* Export results */}
       {hasExported && (
-        <Card className="border-emerald-500/30 bg-emerald-500/5">
+        <Card className="border-green-500/30 bg-green-500/5 shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20">
-                <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/20 shadow-lg shadow-green-500/20">
+                <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <CardTitle className="text-emerald-400">Export Complete</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-green-700 dark:text-green-400">Export Complete</CardTitle>
+                <CardDescription className="text-green-600 dark:text-green-300/60">
                   {exportResults.total_records} total records exported to {exportResults.files_exported.length} files
                 </CardDescription>
               </div>
@@ -134,10 +136,12 @@ export function ExportPanel({
 
       {/* Vector DB Sync */}
       {hasExported && (
-        <Card className="border-slate-800 bg-slate-900/50">
+        <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Database className="h-5 w-5 text-violet-400" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 dark:bg-violet-500/20">
+                <Database className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+              </div>
               Sync to Vector Database
             </CardTitle>
             <CardDescription>
@@ -184,24 +188,26 @@ export function ExportPanel({
       )}
 
       {/* Job summary */}
-      <Card className="border-slate-800 bg-slate-900/50">
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <FileText className="h-4 w-4 text-slate-400" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </div>
             Job Information
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 text-sm md:grid-cols-2">
             <div>
-              <span className="text-slate-500">Job ID</span>
-              <p className="font-mono text-slate-300 mt-1">{jobId}</p>
+              <span className="text-muted-foreground">Job ID</span>
+              <p className="font-mono mt-1">{jobId}</p>
             </div>
             {exportResults && (
               <>
                 <div>
-                  <span className="text-slate-500">Export Path</span>
-                  <p className="font-mono text-xs text-slate-400 mt-1 truncate" title={exportResults.export_path}>
+                  <span className="text-muted-foreground">Export Path</span>
+                  <p className="font-mono text-xs text-muted-foreground mt-1 truncate" title={exportResults.export_path}>
                     {exportResults.export_path}
                   </p>
                 </div>
@@ -222,21 +228,21 @@ interface ExportedFileCardProps {
 
 function ExportedFileCard({ entity, recordCount, onDownload }: ExportedFileCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/30 p-4 transition-all hover:border-slate-700">
+    <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-4 shadow-sm transition-all hover:border-green-500/50 hover:bg-muted/50">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/20">
-          <FileSpreadsheet className="h-5 w-5 text-emerald-400" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/10 dark:bg-green-500/20 shadow-sm">
+          <FileSpreadsheet className="h-5 w-5 text-green-600 dark:text-green-400" />
         </div>
         <div>
-          <p className="font-medium text-slate-200 capitalize">{entity}s.csv</p>
-          <p className="text-xs text-slate-500">{recordCount} records</p>
+          <p className="font-medium capitalize">{entity}s.csv</p>
+          <p className="text-xs text-muted-foreground">{recordCount} records</p>
         </div>
       </div>
       <Button
         variant="ghost"
         size="sm"
         onClick={onDownload}
-        className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+        className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 hover:bg-cyan-500/10"
       >
         <Download className="h-4 w-4" />
       </Button>
@@ -254,17 +260,17 @@ interface ExportSuccessMessageProps {
 export function ExportSuccessMessage({ totalRecords, fileCount, className }: ExportSuccessMessageProps) {
   return (
     <div className={cn(
-      "flex items-center gap-4 rounded-lg bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 p-6",
+      "flex items-center gap-4 rounded-lg bg-gradient-to-r from-green-500/20 to-cyan-500/20 border border-green-500/30 p-6 shadow-lg",
       className
     )}>
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20">
-        <CheckCircle2 className="h-8 w-8 text-emerald-400" />
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20 shadow-lg shadow-green-500/20">
+        <CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400" />
       </div>
       <div>
-        <h3 className="text-xl font-semibold text-emerald-400">Pipeline Complete!</h3>
-        <p className="text-slate-300 mt-1">
-          Successfully exported <span className="font-semibold">{totalRecords}</span> records
-          to <span className="font-semibold">{fileCount}</span> CSV files.
+        <h3 className="text-xl font-semibold text-green-700 dark:text-green-400">Pipeline Complete!</h3>
+        <p className="mt-1">
+          Successfully exported <span className="font-semibold text-green-700 dark:text-green-300">{totalRecords}</span> records
+          to <span className="font-semibold text-green-700 dark:text-green-300">{fileCount}</span> CSV files.
         </p>
       </div>
     </div>

@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDLC AI Impact Assessment Flow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .flow-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .architecture-overview {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .architecture-overview h2 {
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .architecture-diagram {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .pipeline-stage {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .pipeline-stage:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .pipeline-stage.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .stage-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stage-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .stage-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .stage-status {
+            margin-left: auto;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .stage-status.enabled {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .stage-status.disabled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .stage-description {
+            color: #475569;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .stage-details {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pipeline-stage.active .stage-details {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-section h4 {
+            color: #334155;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .detail-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .detail-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #64748b;
+        }
+
+        .detail-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tech-badge {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin-top: 0.5rem;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: #667eea;
+            font-size: 2rem;
+            margin: -0.5rem 0;
+            font-weight: bold;
+        }
+
+        .data-flow-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+        }
+
+        .data-flow-box strong {
+            color: #92400e;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .legend {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .flow-container {
+                padding: 1.5rem;
+            }
+
+            .stage-header {
+                flex-wrap: wrap;
+            }
+
+            .stage-status {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 AI Impact Assessment System</h1>
+            <p>Elevance Health SDLC - Complete Process Flow</p>
+        </header>
+
+        <div class="flow-container">
+            <!-- Architecture Overview -->
+            <div class="architecture-overview">
+                <h2>System Architecture</h2>
+                <div class="architecture-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│                AI Impact Assessment System                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────────┐         ┌─────────────────────┐       │
+│  │  ele-sdlc-frontend  │  HTTP   │  ele-sdlc-backend   │       │
+│  │  (Next.js/React)    │ ──────► │  (FastAPI/LangGraph)│       │
+│  │  Port: 3000         │         │  Port: 8000         │       │
+│  └─────────────────────┘         └─────────────────────┘       │
+│                                           │                     │
+│                                  ┌────────┴────────┐            │
+│                                  ▼                 ▼            │
+│                         ┌──────────────┐  ┌──────────────┐      │
+│                         │   ChromaDB   │  │    Ollama    │      │
+│                         │ Vector Store │  │  Local LLM   │      │
+│                         └──────────────┘  └──────────────┘      │
+└─────────────────────────────────────────────────────────────────┘
+                </div>
+                <div class="tech-stack" style="margin-top: 1rem;">
+                    <span class="tech-badge">FastAPI</span>
+                    <span class="tech-badge">LangGraph</span>
+                    <span class="tech-badge">ChromaDB</span>
+                    <span class="tech-badge">Ollama</span>
+                    <span class="tech-badge">Next.js 16</span>
+                    <span class="tech-badge">React 19</span>
+                    <span class="tech-badge">Python 3.10+</span>
+                    <span class="tech-badge">TypeScript</span>
+                </div>
+            </div>
+
+            <!-- Pipeline Stages -->
+            <h2 style="margin-bottom: 1.5rem; color: #1e293b;">LangGraph Workflow Pipeline</h2>
+
+            <!-- Stage 0: User Input -->
+            <div class="pipeline-stage" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">0</div>
+                    <div class="stage-title">User Input</div>
+                    <span class="stage-status enabled">ACTIVE</span>
+                </div>
+                <div class="stage-description">
+                    User submits a requirement description through the frontend interface
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <h4>Input Sources</h4>
+                        <ul class="detail-list">
+                            <li>Text input from web UI</li>
+                            <li>File upload (.txt, .md, .docx)</li>
+                            <li>Jira Epic ID (optional)</li>
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Frontend Component</h4>
+                        <div class="tech-stack">
+                            <span class="tech-badge">Next.js App Router</span>
+                            <span class="tech-badge">React Context (WizardContext)</span>
+                            <span class="tech-badge">shadcn/ui Forms</span>
+                        </div>
+                    </div>
+                    <div class="data-flow-box">
+                        <strong>Data Output:</strong>
+                        { session_id, requirement_text, jira_epic_id }
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow">↓</div>
+
+            <!-- Stage 1: Requirement Agent -->
+            <div class="pipeline-stage" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">1</div>
+                    <div class="stage-title">Requirement Analysis Agent</div>
+                    <span class="stage-status enabled">ACTIVE</span>
+                </div>
+                <div class="stage-description">
+                    Processes the requirement text and extracts relevant keywords using NLP
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <h4>Processing Steps</h4>
+                        <ul class="detail-list">
+                            <li>Text normalization and cleaning</li>
+                            <li>Keyword extraction using Ollama LLM</li>
+                            <li>Domain-specific term identification</li>
+                            <li>Technical terminology extraction</li>
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Implementation</h4>
+                        <div class="code-block">File: app/components/requirement/service.py
+Agent: requirement_agent()
+Model: phi3:mini (Ollama)
+Output: List of extracted keywords</div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>State Updates</h4>
+                        <div class="tech-stack">
+                            <span class="tech-badge">extracted_keywords: List[str]</span>
+                            <span class="tech-badge">status: "requirement_submitted"</span>
+                        </div>
+                    </div>
+                    <div class="data-flow-box">
+                        <strong>Data Output:</strong>
+                        { extracted_keywords: ["authentication", "user-management", "API", ...] }
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow">↓</div>
+
+            <!-- Stage 2: Historical Match Agent -->
+            <div class="pipeline-stage" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">2</div>
+                    <div class="stage-title">Historical Match Agent</div>
+                    <span class="stage-status enabled">ACTIVE</span>
+                </div>
+                <div class="stage-description">
+                    Performs hybrid search (semantic + keyword) to find similar past requirements
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <h4>Search Strategy</h4>
+                        <ul class="detail-list">
+                            <li><strong>Semantic Search (70%)</strong>: Vector similarity using embeddings</li>
+                            <li><strong>Keyword Search (30%)</strong>: BM25-based keyword matching</li>
+                            <li>Searches across Epics, Estimations, and TDDs collections</li>
+                            <li>Returns top matches with score breakdown</li>
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Vector Database</h4>
+                        <div class="code-block">Database: ChromaDB
+Embedding Model: all-minilm (Ollama)
+Collections: epics, estimations, tdds
+Dimensions: 384 (MiniLM)</div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Implementation</h4>
+                        <div class="tech-stack">
+                            <span class="tech-badge">app/rag/hybrid_search.py</span>
+                            <span class="tech-badge">app/rag/vector_store.py</span>
+                            <span class="tech-badge">app/rag/embeddings.py</span>
+                        </div>
+                    </div>
+                    <div class="data-flow-box">
+                        <strong>Data Output:</strong>
+                        { all_matches: [{ id, score, score_breakdown: {semantic_score, keyword_score}, document, metadata }] }
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow">↓</div>
+
+            <!-- Stage 3: Auto-Select Node -->
+            <div class="pipeline-stage" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">3</div>
+                    <div class="stage-title">Auto-Select Node</div>
+                    <span class="stage-status enabled">ACTIVE</span>
+                </div>
+                <div class="stage-description">
+                    Automatically selects top 5 matches or uses pre-selected matches
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <h4>Selection Logic</h4>
+                        <ul class="detail-list">
+                            <li>If matches already selected (manual mode): Pass through</li>
+                            <li>If no selection: Sort by score descending, take top 5</li>
+                            <li>Enables automated pipeline execution from file uploads</li>
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Implementation</h4>
+                        <div class="code-block">File: app/components/orchestrator/workflow.py
+Function: auto_select_node()
+Routing: Conditional edge based on selection status</div>
+                    </div>
+                    <div class="data-flow-box">
+                        <strong>Data Output:</strong>
+                        { selected_matches: [top 5 matches], status: "matches_selected" }
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow">↓</div>
+
+            <!-- Stage 4: Impacted Modules Agent -->
+            <div class="pipeline-stage" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">4</div>
+                    <div class="stage-title">Impacted Modules Agent</div>
+                    <span class="stage-status enabled">ACTIVE</span>
+                </div>
+                <div class="stage-description">
+                    Analyzes which system modules will be affected by the requirement
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <h4>Analysis Process</h4>
+                        <ul class="detail-list">
+                            <li>Analyzes requirement text and historical matches</li>
+                            <li>Identifies affected system modules/components</li>
+                            <li>Determines impact level per module (High/Medium/Low)</li>
+                            <li>Generates module dependency graph</li>
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>LLM Prompting</h4>
+                        <div class="code-block">Prompt Template: app/components/impacted_modules/prompts.py
+Model: phi3:mini
+Output Format: JSON with modules and impact levels</div>
+                    </div>
+                    <div class="data-flow-box">
+                        <strong>Data Output:</strong>
+                        { impacted_modules_output: { modules: [{ name, impact_level, description }] } }
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow">↓</div>
+
+            <!-- Stage 5: Estimation Effort Agent -->
+            <div class="pipeline-stage" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">5</div>
+                    <div class="stage-title">Estimation Effort Agent</div>
+                    <span class="stage-status enabled">ACTIVE</span>
+                </div>
+                <div class="stage-description">
+                    Calculates development and QA effort estimates based on historical data
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <h4>Estimation Process</h4>
+                        <ul class="detail-list">
+                            <li>Analyzes complexity based on requirement and impacted modules</li>
+                            <li>Retrieves similar past estimations from historical matches</li>
+                            <li>Calculates dev hours, QA hours, and story points</li>
+                            <li>Assigns risk level (Low/Medium/High)</li>
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Output Metrics</h4>
+                        <div class="tech-stack">
+                            <span class="tech-badge">Dev Effort (hours)</span>
+                            <span class="tech-badge">QA Effort (hours)</span>
+                            <span class="tech-badge">Total Effort</span>
+                            <span class="tech-badge">Story Points</span>
+                            <span class="tech-badge">Complexity (S/M/L)</span>
+                            <span class="tech-badge">Risk Level</span>
+                        </div>
+                    </div>
+                    <div class="data-flow-box">
+                        <strong>Data Output:</strong>
+                        { estimation_effort_output: { dev_hours, qa_hours, total_hours, story_points, complexity, risk_level } }
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow">↓</div>
+
+            <!-- Stage 6: TDD Agent -->
+            <div class="pipeline-stage" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">6</div>
+                    <div class="stage-title">Technical Design Document (TDD) Agent</div>
+                    <span class="stage-status enabled">ACTIVE</span>
+                </div>
+                <div class="stage-description">
+                    Generates comprehensive technical design documentation
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <h4>TDD Sections Generated</h4>
+                        <ul class="detail-list">
+                            <li>Executive Summary</li>
+                            <li>Technical Components & Architecture</li>
+                            <li>Design Decisions & Rationale</li>
+                            <li>Dependencies & Integration Points</li>
+                            <li>Security Considerations</li>
+                            <li>Performance Requirements</li>
+                            <li>Testing Strategy</li>
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Generation Process</h4>
+                        <div class="code-block">Input: Requirement + Historical TDDs + Estimations
+Model: phi3:mini
+Output: Structured markdown document
+Storage: sessions/{date}/{session_id}/step3_agents/agent_tdd/</div>
+                    </div>
+                    <div class="data-flow-box">
+                        <strong>Data Output:</strong>
+                        { tdd_output: { tdd_name, tdd_description, technical_components, design_decisions, dependencies, security, performance } }
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow">↓</div>
+
+            <!-- Stage 7: Jira Stories Agent -->
+            <div class="pipeline-stage" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">7</div>
+                    <div class="stage-title">Jira Stories Agent</div>
+                    <span class="stage-status enabled">ACTIVE</span>
+                </div>
+                <div class="stage-description">
+                    Generates actionable Jira user stories and tasks
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <h4>Story Generation</h4>
+                        <ul class="detail-list">
+                            <li>Breaks down requirement into user stories</li>
+                            <li>Creates sub-tasks for each story</li>
+                            <li>Assigns story points based on effort estimates</li>
+                            <li>Defines acceptance criteria</li>
+                            <li>Sets priority levels (Critical/High/Medium/Low)</li>
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Story Structure</h4>
+                        <div class="tech-stack">
+                            <span class="tech-badge">Story Title</span>
+                            <span class="tech-badge">Description</span>
+                            <span class="tech-badge">Acceptance Criteria</span>
+                            <span class="tech-badge">Story Points</span>
+                            <span class="tech-badge">Priority</span>
+                            <span class="tech-badge">Labels</span>
+                        </div>
+                    </div>
+                    <div class="data-flow-box">
+                        <strong>Data Output:</strong>
+                        { jira_stories_output: { stories: [{ title, description, acceptance_criteria, story_points, priority, labels }] } }
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow">↓</div>
+
+            <!-- Stage 8: Code Impact Agent (DISABLED) -->
+            <div class="pipeline-stage" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">8</div>
+                    <div class="stage-title">Code Impact Agent</div>
+                    <span class="stage-status disabled">DISABLED</span>
+                </div>
+                <div class="stage-description">
+                    [Currently Disabled] Analyzes impact on existing codebase
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <h4>Planned Functionality</h4>
+                        <ul class="detail-list">
+                            <li>Analyze GitLab repository structure</li>
+                            <li>Identify affected files and functions</li>
+                            <li>Estimate code changes required</li>
+                            <li>Assess backward compatibility risks</li>
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Status</h4>
+                        <div class="code-block">// Commented out in workflow.py
+// Frontend UI also hides this section
+// Will be enabled in future release</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow">↓</div>
+
+            <!-- Stage 9: Risks Agent (DISABLED) -->
+            <div class="pipeline-stage" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">9</div>
+                    <div class="stage-title">Risk Assessment Agent</div>
+                    <span class="stage-status disabled">DISABLED</span>
+                </div>
+                <div class="stage-description">
+                    [Currently Disabled] Identifies potential risks and mitigation strategies
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <h4>Planned Functionality</h4>
+                        <ul class="detail-list">
+                            <li>Identify technical risks</li>
+                            <li>Assess timeline risks</li>
+                            <li>Evaluate resource availability</li>
+                            <li>Generate mitigation strategies</li>
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Status</h4>
+                        <div class="code-block">// Commented out in workflow.py
+// Frontend UI also hides this section
+// Will be enabled in future release</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow">↓</div>
+
+            <!-- Stage 10: Complete -->
+            <div class="pipeline-stage" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">✓</div>
+                    <div class="stage-title">Pipeline Complete</div>
+                    <span class="stage-status enabled">ACTIVE</span>
+                </div>
+                <div class="stage-description">
+                    Assessment complete - Results stored and displayed to user
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <h4>Final Outputs</h4>
+                        <ul class="detail-list">
+                            <li>Complete impact assessment JSON</li>
+                            <li>Session audit trail with all artifacts</li>
+                            <li>Downloadable TDD markdown file</li>
+                            <li>Exportable Jira stories</li>
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Storage Locations</h4>
+                        <div class="code-block">sessions/{date}/{session_id}/
+├── step1_input/
+├── step2_search/
+├── step3_agents/
+│   ├── agent_tdd/
+│   ├── agent_jira_stories/
+│   └── ...
+└── final_summary.json</div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Frontend Display</h4>
+                        <div class="tech-stack">
+                            <span class="tech-badge">SDLCContext State</span>
+                            <span class="tech-badge">Wizard Navigation</span>
+                            <span class="tech-badge">Results Dashboard</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #dcfce7; border: 2px solid #166534;"></div>
+                    <span>Active Agent</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fee2e2; border: 2px solid #991b1b;"></div>
+                    <span>Disabled Agent</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #dbeafe; border: 2px solid #1e40af;"></div>
+                    <span>Technology/Tool</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Generated: 2026-01-20 | Elevance Health SDLC | AI Impact Assessment System</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleStage(element) {
+            const wasActive = element.classList.contains('active');
+
+            // Remove active class from all stages
+            document.querySelectorAll('.pipeline-stage').forEach(stage => {
+                stage.classList.remove('active');
+            });
+
+            // Toggle active class on clicked element
+            if (!wasActive) {
+                element.classList.add('active');
+            }
+        }
+
+        // Auto-expand first stage on load
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.pipeline-stage').classList.add('active');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+%% SDLC AI Impact Assessment System Flow Diagram
+%% Can be rendered at: https://mermaid.live/
+
+flowchart TD
+    Start([User Submits Requirement]) --> Input[User Input Layer]
+
+    Input -->|POST /api/v1/orchestrator/run| Backend[FastAPI Backend<br/>Port 8000]
+
+    Backend --> Workflow[LangGraph Workflow<br/>Pipeline Execution]
+
+    Workflow --> Agent1[Agent 1: Requirement Analysis]
+
+    Agent1 -->|Extract Keywords| Keywords[Keyword Extraction<br/>Using Ollama phi3:mini]
+    Keywords --> State1[State Update:<br/>extracted_keywords]
+
+    State1 --> Agent2[Agent 2: Historical Match]
+    Agent2 --> VectorDB[(ChromaDB<br/>Vector Store)]
+    VectorDB -->|Semantic Search 70%| Embeddings[all-minilm<br/>Embeddings]
+    VectorDB -->|Keyword Search 30%| BM25[BM25 Search]
+
+    Embeddings --> Fusion[Score Fusion]
+    BM25 --> Fusion
+    Fusion --> Matches[all_matches<br/>Ranked Results]
+
+    Matches --> State2[State Update:<br/>all_matches]
+    State2 --> Agent3[Agent 3: Auto-Select]
+
+    Agent3 -->|Check Selection| Decision1{Pre-selected<br/>Matches?}
+    Decision1 -->|Yes| UseSelected[Use Selected Matches]
+    Decision1 -->|No| AutoSelect[Auto-select Top 5]
+
+    UseSelected --> State3[State Update:<br/>selected_matches]
+    AutoSelect --> State3
+
+    State3 --> Agent4[Agent 4: Impacted Modules]
+    Agent4 -->|Analyze Impact| LLM1[Ollama LLM<br/>phi3:mini]
+    LLM1 --> Modules[Module Impact Analysis]
+    Modules --> State4[State Update:<br/>impacted_modules_output]
+
+    State4 --> Agent5[Agent 5: Estimation Effort]
+    Agent5 -->|Calculate Effort| EstLogic[Historical Data<br/>+ Complexity Analysis]
+    EstLogic --> Estimates[Effort Estimates<br/>Dev/QA Hours, Story Points]
+    Estimates --> State5[State Update:<br/>estimation_effort_output]
+
+    State5 --> Agent6[Agent 6: TDD Generation]
+    Agent6 -->|Generate TDD| LLM2[Ollama LLM<br/>phi3:mini]
+    LLM2 --> TDD[Technical Design Doc<br/>Markdown Format]
+    TDD --> State6[State Update:<br/>tdd_output]
+
+    State6 --> Agent7[Agent 7: Jira Stories]
+    Agent7 -->|Generate Stories| LLM3[Ollama LLM<br/>phi3:mini]
+    LLM3 --> Stories[User Stories<br/>+ Acceptance Criteria]
+    Stories --> State7[State Update:<br/>jira_stories_output]
+
+    State7 --> Complete[Pipeline Complete<br/>status: completed]
+
+    Complete --> Storage[Session Storage]
+    Storage --> Files[Audit Trail Files<br/>sessions/date/session_id/]
+
+    Complete --> Frontend[Frontend Display]
+    Frontend --> UI[Next.js UI<br/>Results Dashboard]
+
+    %% Disabled Agents (shown for completeness)
+    State7 -.->|Disabled| Agent8[Agent 8: Code Impact<br/>DISABLED]
+    Agent8 -.->|Disabled| Agent9[Agent 9: Risk Assessment<br/>DISABLED]
+    Agent9 -.->|Disabled| CompleteAll[Complete]
+
+    %% Styling
+    classDef activeAgent fill:#dcfce7,stroke:#166534,stroke-width:2px
+    classDef disabledAgent fill:#fee2e2,stroke:#991b1b,stroke-width:2px,stroke-dasharray: 5 5
+    classDef dataStore fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+    classDef llmNode fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+    classDef stateNode fill:#e0e7ff,stroke:#4f46e5,stroke-width:2px
+
+    class Agent1,Agent2,Agent3,Agent4,Agent5,Agent6,Agent7 activeAgent
+    class Agent8,Agent9 disabledAgent
+    class VectorDB,Storage,Files dataStore
+    class LLM1,LLM2,LLM3,Keywords,Embeddings llmNode
+    class State1,State2,State3,State4,State5,State6,State7 stateNode
+
+%% Legend:
+%% Green boxes = Active agents in pipeline
+%% Red dashed boxes = Disabled agents
+%% Blue boxes = Data storage
+%% Yellow boxes = LLM operations
+%% Purple boxes = State updates

@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How AI Impact Assessment Works</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: #fafbfc;
+            min-height: 100vh;
+            padding: 2rem;
+            padding-bottom: 10rem;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: #24292f;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: #57606a;
+        }
+
+        .tech-info {
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 0.9rem;
+        }
+
+        .tech-info strong {
+            color: #24292f;
+        }
+
+        .tech-info span {
+            color: #57606a;
+        }
+
+        .flowchart-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            position: relative;
+            min-height: 1800px;
+            padding: 2rem;
+        }
+
+        /* SVG for connections */
+        .connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .connection-line {
+            stroke: #24292f;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 5 5;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .connection-line.visible {
+            opacity: 0.6;
+            animation: dash 40s linear infinite;
+        }
+
+        .connection-line.highlighted {
+            opacity: 1;
+            animation: dash 40s linear infinite;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -1000;
+            }
+        }
+
+        /* Connection dots */
+        .connection-dot {
+            fill: #24292f;
+            r: 6;
+        }
+
+        /* Moving dots */
+        .moving-dot {
+            fill: #24292f;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .moving-dot.active {
+            opacity: 1;
+        }
+
+        /* Node styles - matching Ralph AI */
+        .node {
+            position: absolute;
+            background: #ddf4ff;
+            border: 2px solid #54aeff;
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            min-width: 200px;
+            max-width: 260px;
+            box-shadow: none;
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: scale(0.8);
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .node:hover:not(.disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(9, 105, 218, 0.2);
+        }
+
+        .node.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .node.highlighted {
+            border-color: #0969da;
+            border-width: 2px;
+            box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+        }
+
+        .node.decision {
+            background: #fff8c5;
+            border-color: #d4a72c;
+        }
+
+        .node.disabled {
+            background: #f6f8fa;
+            border-color: #d0d7de;
+        }
+
+        .node h3 {
+            font-size: 1rem;
+            color: #24292f;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+        }
+
+        .node p {
+            font-size: 0.85rem;
+            color: #57606a;
+            line-height: 1.3;
+        }
+
+        .node .badge {
+            display: inline-block;
+            background: rgba(9, 105, 218, 0.12);
+            color: #0969da;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        /* Code boxes - matching Ralph AI style */
+        .code-box {
+            position: absolute;
+            background: #f6f8fa;
+            border: 2px dashed #8250df;
+            border-radius: 6px;
+            padding: 1rem;
+            padding-top: 2.5rem;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: #24292f;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            max-width: 350px;
+            max-height: 320px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 15;
+            line-height: 1.5;
+        }
+
+        .code-box.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .code-box-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #8250df;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .code-box-close:hover {
+            background: #6639ba;
+        }
+
+        .node .info-icon {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(130, 80, 223, 0.15);
+            color: #8250df;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        .code-box strong {
+            color: #0969da;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Custom scrollbar for code boxes */
+        .code-box::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .code-box::-webkit-scrollbar-track {
+            background: #d0d7de;
+            border-radius: 5px;
+        }
+
+        .code-box::-webkit-scrollbar-thumb {
+            background: #8250df;
+            border-radius: 5px;
+        }
+
+        .code-box::-webkit-scrollbar-thumb:hover {
+            background: #6639ba;
+        }
+
+        /* Non-linear positioning - Ralph AI style */
+        #node-0 {
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #node-1 {
+            top: 200px;
+            left: 28%;
+        }
+
+        #node-2 {
+            top: 400px;
+            left: 20%;
+        }
+
+        #node-3 {
+            top: 600px;
+            left: 35%;
+        }
+
+        #node-4 {
+            top: 820px;
+            left: 8%;
+        }
+
+        #node-5 {
+            top: 820px;
+            right: 8%;
+        }
+
+        #node-6 {
+            top: 1060px;
+            left: 22%;
+        }
+
+        #node-7 {
+            top: 1300px;
+            right: 22%;
+        }
+
+        #node-8 {
+            top: 1540px;
+            left: 15%;
+        }
+
+        #node-9 {
+            top: 1540px;
+            right: 15%;
+        }
+
+        /* Code boxes - positioned around nodes */
+        #code-1 {
+            top: 180px;
+            right: 8%;
+        }
+
+        #code-2 {
+            top: 380px;
+            right: 10%;
+        }
+
+        #code-3 {
+            top: 800px;
+            left: 52%;
+        }
+
+        #code-4 {
+            top: 800px;
+            right: 52%;
+        }
+
+        #code-5 {
+            top: 1040px;
+            right: 8%;
+        }
+
+        #code-6 {
+            top: 1280px;
+            left: 8%;
+        }
+
+        /* Controls - Fixed at bottom */
+        .controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 1.5rem 2rem;
+            background: white;
+            border-top: 1px solid #d0d7de;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .controls .step-info {
+            font-size: 0.95rem;
+            color: #57606a;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: 1px solid #d0d7de;
+            background: white;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: #24292f;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #f6f8fa;
+            border-color: #0969da;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn.primary {
+            background: #0969da;
+            border-color: #0969da;
+            color: white;
+        }
+
+        .btn.primary:hover:not(:disabled) {
+            background: #0550ae;
+            border-color: #0550ae;
+        }
+
+        .hint {
+            margin-top: 0.5rem;
+            color: #8c959f;
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            body {
+                padding: 1rem;
+                padding-bottom: 10rem;
+            }
+
+            .flowchart-container {
+                min-height: auto;
+                padding: 1rem;
+            }
+
+            .node {
+                position: relative !important;
+                left: auto !important;
+                right: auto !important;
+                top: auto !important;
+                transform: none !important;
+                margin: 1.5rem auto !important;
+                max-width: 90%;
+            }
+
+            .code-box {
+                position: relative !important;
+                left: auto !important;
+                right: auto !important;
+                top: auto !important;
+                margin: 1rem auto !important;
+                max-width: 90% !important;
+            }
+
+            .connections {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>How AI Impact Assessment Works</h1>
+        <p>Autonomous AI agent pipeline for analyzing software requirements</p>
+        <div class="tech-info">
+            <strong>⚡ Complete Pipeline: ~30 seconds</strong> ·
+            <span>7 Active Agents · Ollama (phi3:mini, all-minilm) · ChromaDB · LangGraph</span>
+        </div>
+    </header>
+
+    <div class="flowchart-container">
+        <!-- SVG for connections -->
+        <svg class="connections" id="connections">
+            <!-- Arrow marker definitions -->
+            <defs>
+                <!-- Standard arrow for main flow connections -->
+                <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#24292f" />
+                </marker>
+                <!-- Purple arrow for code box connections -->
+                <marker id="arrowhead-purple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#8250df" />
+                </marker>
+            </defs>
+            <!-- Lines will be drawn here -->
+        </svg>
+
+        <!-- Nodes -->
+        <div class="node" id="node-0" data-step="0">
+            <h3>User Input</h3>
+            <p>Define your requirement</p>
+            <span class="badge">Start</span>
+        </div>
+
+        <div class="node" id="node-1" data-step="1" data-code="code-1">
+            <span class="info-icon">ℹ</span>
+            <h3>1️⃣ Requirement Analysis</h3>
+            <p>Extract keywords from requirement text using LLM</p>
+            <span class="badge">phi3:mini · ~1.5s</span>
+        </div>
+
+        <div class="code-box" id="code-1">
+            <button class="code-box-close" onclick="closeCodeBox('code-1')">✕</button>
+            <strong>Input:</strong>
+POST /api/v1/orchestrator/run
+{
+  "requirement": "Add OAuth authentication
+   with session management"
+}
+
+<strong>Output:</strong>
+{
+  "keywords": [
+    "authentication", "OAuth",
+    "user-management", "session-handling"
+  ]
+}
+
+<strong>Endpoint:</strong> http://localhost:11434/api/generate
+<strong>Model:</strong> phi3:mini (3B parameters)
+<strong>Saves to:</strong> sessions/{date}/{id}/
+             step1_input/extracted_keywords.json</div>
+
+        <div class="node" id="node-2" data-step="2" data-code="code-2">
+            <span class="info-icon">ℹ</span>
+            <h3>2️⃣ Historical Match</h3>
+            <p>Hybrid search: 70% semantic + 30% keyword</p>
+            <span class="badge">ChromaDB · all-minilm · ~3.5s</span>
+        </div>
+
+        <div class="code-box" id="code-2">
+            <button class="code-box-close" onclick="closeCodeBox('code-2')">✕</button>
+            <strong>Hybrid Search Formula:</strong>
+final_score = (0.7 × semantic) + (0.3 × keyword)
+
+<strong>Example Result:</strong>
+{
+  "epic_id": "EPIC-1234",
+  "score": 0.8642,
+  "score_breakdown": {
+    "semantic_score": 0.89,
+    "keyword_score": 0.81
+  },
+  "description": "OAuth2 integration with SSO support",
+  "metadata": {
+    "dev_hours": 120,
+    "qa_hours": 40,
+    "complexity": "Large"
+  }
+}
+
+<strong>Model:</strong> all-minilm (384-dim embeddings)
+<strong>Collections:</strong> epics, estimations, tdds
+<strong>Saves to:</strong> step2_search/all_matches.json</div>
+
+        <div class="node decision" id="node-3" data-step="3">
+            <h3>3️⃣ Auto-Select</h3>
+            <p>Select top 5 matches by score</p>
+            <span class="badge">Filtering · ~0.1s</span>
+        </div>
+
+        <div class="node" id="node-4" data-step="4" data-code="code-3">
+            <span class="info-icon">ℹ</span>
+            <h3>4️⃣ Impacted Modules</h3>
+            <p>Analyze which system modules are affected</p>
+            <span class="badge">phi3:mini · ~5.5s</span>
+        </div>
+
+        <div class="code-box" id="code-3">
+            <button class="code-box-close" onclick="closeCodeBox('code-3')">✕</button>
+            <strong>Output:</strong>
+{
+  "modules": [
+    {
+      "name": "Authentication Service",
+      "impact": "High",
+      "reason": "Core OAuth implementation",
+      "estimated_changes": "30-40%"
+    },
+    {
+      "name": "User Management API",
+      "impact": "Medium",
+      "reason": "Session handling changes",
+      "estimated_changes": "15-20%"
+    },
+    {
+      "name": "API Gateway",
+      "impact": "Low",
+      "reason": "Token validation updates",
+      "estimated_changes": "5-10%"
+    }
+  ]
+}
+
+<strong>Analysis Method:</strong> LLM analyzes requirement context
+<strong>Saves to:</strong> step3_agents/agent_impacted_modules/
+             parsed_output.json</div>
+
+        <div class="node" id="node-5" data-step="4" data-code="code-4">
+            <span class="info-icon">ℹ</span>
+            <h3>5️⃣ Estimation Effort</h3>
+            <p>Calculate effort based on historical data</p>
+            <span class="badge">phi3:mini · ~4.2s</span>
+        </div>
+
+        <div class="code-box" id="code-4">
+            <button class="code-box-close" onclick="closeCodeBox('code-4')">✕</button>
+            <strong>Output:</strong>
+{
+  "dev_hours": 120,
+  "qa_hours": 40,
+  "story_points": 21,
+  "complexity": "Large",
+  "risk_level": "Medium",
+  "confidence": "High",
+  "breakdown": {
+    "backend": 80,
+    "frontend": 30,
+    "testing": 10
+  }
+}
+
+<strong>Calculation:</strong>
+- Analyzes historical similar projects
+- Considers module complexity
+- Factors in team velocity
+- Adjusts for technical debt
+
+<strong>Saves to:</strong> step3_agents/agent_estimation_effort/
+             parsed_output.json</div>
+
+        <div class="node" id="node-6" data-step="5" data-code="code-5">
+            <span class="info-icon">ℹ</span>
+            <h3>6️⃣ TDD Generation</h3>
+            <p>Complete technical design document</p>
+            <span class="badge">phi3:mini · ~9s</span>
+        </div>
+
+        <div class="code-box" id="code-5">
+            <button class="code-box-close" onclick="closeCodeBox('code-5')">✕</button>
+            <strong>TDD Structure:</strong>
+1. Executive Summary
+   - Overview of changes
+   - Business justification
+
+2. Component Details
+   - Affected services
+   - APIs and interfaces
+
+3. Architecture & Design
+   - System diagrams
+   - Data flow
+
+4. Dependencies & Integration
+   - External services
+   - Library requirements
+
+5. Security Considerations
+   - Authentication flows
+   - Authorization checks
+
+6. Performance & Scalability
+   - Load expectations
+   - Caching strategy
+
+7. Testing Strategy
+   - Unit tests
+   - Integration tests
+   - E2E tests
+
+<strong>Saves to:</strong> step3_agents/agent_tdd/tdd.md
+<strong>Storage:</strong> ChromaDB (tdds collection)</div>
+
+        <div class="node" id="node-7" data-step="6" data-code="code-6">
+            <span class="info-icon">ℹ</span>
+            <h3>7️⃣ Jira Stories</h3>
+            <p>User stories with acceptance criteria</p>
+            <span class="badge">phi3:mini · ~6s</span>
+        </div>
+
+        <div class="code-box" id="code-6">
+            <button class="code-box-close" onclick="closeCodeBox('code-6')">✕</button>
+            <strong>Story Format:</strong>
+{
+  "stories": [
+    {
+      "title": "Implement OAuth2 Login Flow",
+      "description": "As a user, I want to log in
+                      using OAuth2 so that I can
+                      securely access the application",
+      "acceptance_criteria": [
+        "User can initiate OAuth2 login",
+        "Session tokens are securely stored",
+        "Token refresh works automatically",
+        "Logout clears all session data"
+      ],
+      "story_points": 8,
+      "priority": "High",
+      "labels": ["security", "authentication"],
+      "dependencies": ["EPIC-1234"]
+    },
+    {
+      "title": "Update User Session Management",
+      "description": "As a system, I need to
+                      manage user sessions...",
+      "acceptance_criteria": [
+        "Sessions expire after timeout",
+        "Multiple device support"
+      ],
+      "story_points": 5,
+      "priority": "Medium"
+    }
+  ]
+}
+
+<strong>Saves to:</strong> step3_agents/agent_jira_stories/
+             parsed_output.json</div>
+
+        <div class="node disabled" id="node-8" data-step="7">
+            <h3>8️⃣ Code Impact</h3>
+            <p>Analyze codebase changes</p>
+            <span class="badge">Phase 2</span>
+        </div>
+
+        <div class="node disabled" id="node-9" data-step="7">
+            <h3>9️⃣ Risk Assessment</h3>
+            <p>Identify potential risks</p>
+            <span class="badge">Phase 2</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="step-info">
+            <strong>Step <span id="current-step">0</span> of <span id="total-steps">7</span></strong>
+        </div>
+        <div class="button-group">
+            <button class="btn" id="prev-btn" onclick="previousStep()">Previous</button>
+            <button class="btn primary" id="next-btn" onclick="nextStep()">Next</button>
+            <button class="btn" id="reset-btn" onclick="resetFlow()">Reset</button>
+            <button class="btn" id="auto-btn" onclick="toggleAutoPlay()">Auto Play</button>
+        </div>
+        <p class="hint">Click Next to reveal each agent · Click nodes with ℹ icon to view details · Arrow Keys or Spacebar to navigate · 'R' to reset · 'A' for auto-play</p>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const totalSteps = 7;
+        let autoPlayInterval = null;
+        let isAutoPlaying = false;
+        let connectionsDrawn = false;
+
+        // Main flow connections
+        const mainConnections = [
+            ['node-0', 'node-1'],
+            ['node-1', 'node-2'],
+            ['node-2', 'node-3'],
+            ['node-3', 'node-4'],
+            ['node-3', 'node-5'],
+            ['node-4', 'node-6'],
+            ['node-5', 'node-6'],
+            ['node-6', 'node-7'],
+            ['node-7', 'node-8'],
+            ['node-7', 'node-9']
+        ];
+
+        // Connections from nodes to their code boxes
+        const codeConnections = [
+            ['node-1', 'code-1'],
+            ['node-2', 'code-2'],
+            ['node-4', 'code-3'],
+            ['node-5', 'code-4'],
+            ['node-6', 'code-5'],
+            ['node-7', 'code-6']
+        ];
+
+        function getNodeCenter(nodeId) {
+            const node = document.getElementById(nodeId);
+            if (!node) return { x: 0, y: 0 };
+
+            const rect = node.getBoundingClientRect();
+            const container = document.querySelector('.flowchart-container');
+            const containerRect = container.getBoundingClientRect();
+
+            return {
+                x: rect.left - containerRect.left + rect.width / 2,
+                y: rect.top - containerRect.top + rect.height / 2
+            };
+        }
+
+        function createCurvedPath(from, to) {
+            // Calculate control points for smooth bezier curve
+            const dx = to.x - from.x;
+            const dy = to.y - from.y;
+
+            // Adjust curve intensity based on direction
+            const curveIntensity = 0.5;
+
+            // Control points for the bezier curve
+            let cx1, cy1, cx2, cy2;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Horizontal curve
+                cx1 = from.x + dx * curveIntensity;
+                cy1 = from.y;
+                cx2 = to.x - dx * curveIntensity;
+                cy2 = to.y;
+            } else {
+                // Vertical curve with some horizontal offset
+                cx1 = from.x + dx * 0.3;
+                cy1 = from.y + dy * curveIntensity;
+                cx2 = to.x - dx * 0.3;
+                cy2 = to.y - dy * curveIntensity;
+            }
+
+            return `M ${from.x} ${from.y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${to.x} ${to.y}`;
+        }
+
+        function drawConnections() {
+            const svg = document.getElementById('connections');
+
+            // Clear existing (but preserve defs)
+            const defs = svg.querySelector('defs');
+            while (svg.firstChild) {
+                svg.removeChild(svg.firstChild);
+            }
+
+            // Restore or create defs with arrow markers
+            if (defs) {
+                svg.appendChild(defs);
+            } else {
+                const newDefs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+
+                // Standard arrow for main flow
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '10');
+                marker.setAttribute('markerHeight', '10');
+                marker.setAttribute('refX', '9');
+                marker.setAttribute('refY', '3');
+                marker.setAttribute('orient', 'auto');
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 10 3, 0 6');
+                polygon.setAttribute('fill', '#24292f');
+                marker.appendChild(polygon);
+                newDefs.appendChild(marker);
+
+                // Purple arrow for code boxes
+                const markerPurple = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                markerPurple.setAttribute('id', 'arrowhead-purple');
+                markerPurple.setAttribute('markerWidth', '10');
+                markerPurple.setAttribute('markerHeight', '10');
+                markerPurple.setAttribute('refX', '9');
+                markerPurple.setAttribute('refY', '3');
+                markerPurple.setAttribute('orient', 'auto');
+                const polygonPurple = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygonPurple.setAttribute('points', '0 0, 10 3, 0 6');
+                polygonPurple.setAttribute('fill', '#8250df');
+                markerPurple.appendChild(polygonPurple);
+                newDefs.appendChild(markerPurple);
+
+                svg.appendChild(newDefs);
+            }
+
+            const visibleNodes = document.querySelectorAll('.node.visible');
+            if (visibleNodes.length === 0) return;
+
+            // Draw main flow connections
+            mainConnections.forEach((conn, index) => {
+                const fromNode = document.getElementById(conn[0]);
+                const toNode = document.getElementById(conn[1]);
+
+                if (!fromNode || !toNode) return;
+
+                const from = getNodeCenter(conn[0]);
+                const to = getNodeCenter(conn[1]);
+
+                if (from.x === 0 || to.x === 0) return;
+
+                // Draw connection dots
+                const dot1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                dot1.setAttribute('cx', from.x);
+                dot1.setAttribute('cy', from.y);
+                dot1.setAttribute('class', 'connection-dot');
+                svg.appendChild(dot1);
+
+                const dot2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                dot2.setAttribute('cx', to.x);
+                dot2.setAttribute('cy', to.y);
+                dot2.setAttribute('class', 'connection-dot');
+                svg.appendChild(dot2);
+
+                // Create curved path
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const pathD = createCurvedPath(from, to);
+                path.setAttribute('d', pathD);
+                path.setAttribute('class', 'connection-line');
+                path.setAttribute('id', `main-line-${index}`);
+                path.setAttribute('marker-end', 'url(#arrowhead)');
+                svg.appendChild(path);
+            });
+
+            // Draw code box connections
+            codeConnections.forEach((conn, index) => {
+                const fromNode = document.getElementById(conn[0]);
+                const toBox = document.getElementById(conn[1]);
+
+                if (!fromNode || !toBox) return;
+
+                const from = getNodeCenter(conn[0]);
+                const to = getNodeCenter(conn[1]);
+
+                if (from.x === 0 || to.x === 0) return;
+
+                // Create curved dashed path to code box
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const pathD = createCurvedPath(from, to);
+                path.setAttribute('d', pathD);
+                path.setAttribute('class', 'connection-line');
+                path.setAttribute('id', `code-line-${index}`);
+                path.setAttribute('stroke', '#8250df');
+                path.setAttribute('opacity', '0.4');
+                path.setAttribute('marker-end', 'url(#arrowhead-purple)');
+                svg.appendChild(path);
+            });
+
+            connectionsDrawn = true;
+        }
+
+        function updateDisplay() {
+            document.getElementById('current-step').textContent = currentStep;
+            document.getElementById('total-steps').textContent = totalSteps;
+
+            // Show nodes up to current step
+            document.querySelectorAll('.node').forEach((node) => {
+                const nodeStep = parseInt(node.dataset.step);
+                if (nodeStep <= currentStep) {
+                    node.classList.add('visible');
+                    if (nodeStep === currentStep) {
+                        node.classList.add('highlighted');
+                    } else {
+                        node.classList.remove('highlighted');
+                    }
+                } else {
+                    node.classList.remove('visible', 'highlighted');
+                    // Hide associated code box if node becomes invisible
+                    const codeId = node.dataset.code;
+                    if (codeId) {
+                        const codeBox = document.getElementById(codeId);
+                        if (codeBox) {
+                            codeBox.classList.remove('visible');
+                        }
+                    }
+                }
+            });
+
+            // Code boxes are now controlled by click events, not automatically shown
+
+            // Redraw connections
+            if (currentStep > 0) {
+                setTimeout(() => {
+                    drawConnections();
+                    updateConnections();
+                }, 100);
+            }
+
+            // Update buttons
+            document.getElementById('prev-btn').disabled = currentStep === 0;
+            document.getElementById('next-btn').disabled = currentStep === totalSteps;
+        }
+
+        function toggleCodeBox(codeId) {
+            const codeBox = document.getElementById(codeId);
+            if (codeBox) {
+                codeBox.classList.toggle('visible');
+                // Redraw connections to show/hide code box connection
+                setTimeout(() => {
+                    drawConnections();
+                    updateConnections();
+                }, 50);
+            }
+        }
+
+        function closeCodeBox(codeId) {
+            const codeBox = document.getElementById(codeId);
+            if (codeBox) {
+                codeBox.classList.remove('visible');
+                // Redraw connections
+                setTimeout(() => {
+                    drawConnections();
+                    updateConnections();
+                }, 50);
+            }
+        }
+
+        function updateConnections() {
+            if (!connectionsDrawn) return;
+
+            // Update main connection visibility
+            mainConnections.forEach((conn, index) => {
+                const fromNode = document.getElementById(conn[0]);
+                const toNode = document.getElementById(conn[1]);
+
+                if (!fromNode || !toNode) return;
+
+                const fromStep = parseInt(fromNode.dataset.step);
+                const toStep = parseInt(toNode.dataset.step);
+
+                const line = document.getElementById(`main-line-${index}`);
+                if (!line) return;
+
+                if (currentStep >= toStep) {
+                    line.classList.add('visible', 'highlighted');
+                } else if (currentStep >= fromStep) {
+                    line.classList.add('visible');
+                    line.classList.remove('highlighted');
+                } else {
+                    line.classList.remove('visible', 'highlighted');
+                }
+            });
+
+            // Update code connection visibility (only show if code box is visible)
+            codeConnections.forEach((conn, index) => {
+                const node = document.getElementById(conn[0]);
+                const box = document.getElementById(conn[1]);
+
+                if (!node || !box) return;
+
+                const line = document.getElementById(`code-line-${index}`);
+
+                if (line && box.classList.contains('visible')) {
+                    line.classList.add('visible');
+                } else if (line) {
+                    line.classList.remove('visible');
+                }
+            });
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateDisplay();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                updateDisplay();
+            }
+        }
+
+        function resetFlow() {
+            stopAutoPlay();
+            currentStep = 0;
+
+            // Hide all code boxes
+            document.querySelectorAll('.code-box').forEach((box) => {
+                box.classList.remove('visible');
+            });
+
+            const svg = document.getElementById('connections');
+            while (svg.firstChild) {
+                svg.removeChild(svg.firstChild);
+            }
+            connectionsDrawn = false;
+
+            updateDisplay();
+        }
+
+        function toggleAutoPlay() {
+            if (isAutoPlaying) {
+                stopAutoPlay();
+            } else {
+                startAutoPlay();
+            }
+        }
+
+        function startAutoPlay() {
+            isAutoPlaying = true;
+            document.getElementById('auto-btn').textContent = 'Stop';
+            document.getElementById('auto-btn').classList.add('primary');
+
+            if (currentStep === totalSteps) {
+                resetFlow();
+            }
+
+            autoPlayInterval = setInterval(() => {
+                if (currentStep < totalSteps) {
+                    nextStep();
+                } else {
+                    stopAutoPlay();
+                }
+            }, 2500);
+        }
+
+        function stopAutoPlay() {
+            isAutoPlaying = false;
+            document.getElementById('auto-btn').textContent = 'Auto Play';
+            document.getElementById('auto-btn').classList.remove('primary');
+
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            updateDisplay();
+
+            // Add click event listeners to nodes with code boxes
+            document.querySelectorAll('.node[data-code]').forEach((node) => {
+                node.addEventListener('click', (e) => {
+                    // Only toggle if node is visible
+                    if (node.classList.contains('visible')) {
+                        const codeId = node.dataset.code;
+                        toggleCodeBox(codeId);
+                    }
+                });
+            });
+        });
+
+        // Redraw on resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (currentStep > 0 && connectionsDrawn) {
+                    drawConnections();
+                    updateConnections();
+                }
+            }, 250);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextStep();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousStep();
+            } else if (e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                resetFlow();
+            } else if (e.key === 'a' || e.key === 'A') {
+                e.preventDefault();
+                toggleAutoPlay();
+            }
+        });
+    </script>
+</body>
+</html>

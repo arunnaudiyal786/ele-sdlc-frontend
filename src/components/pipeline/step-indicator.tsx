@@ -27,11 +27,11 @@ export function StepIndicator({ className }: StepIndicatorProps) {
       {/* Pipeline flow visualization */}
       <div className="relative">
         {/* Background track */}
-        <div className="absolute top-6 left-0 right-0 h-0.5 bg-slate-800" />
+        <div className="absolute top-6 left-0 right-0 h-0.5 bg-border" />
 
-        {/* Progress track */}
+        {/* Progress track - gradient from cyan to blue */}
         <div
-          className="absolute top-6 left-0 h-0.5 bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-500"
+          className="absolute top-6 left-0 h-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500"
           style={{
             width: `${Math.max(0, (PIPELINE_STEPS.findIndex(s => s.id === currentStep) / (PIPELINE_STEPS.length - 1)) * 100)}%`
           }}
@@ -55,27 +55,21 @@ export function StepIndicator({ className }: StepIndicatorProps) {
                 {/* Step circle */}
                 <div
                   className={cn(
-                    "relative z-10 flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all duration-300",
-                    isCompleted && "border-emerald-500 bg-emerald-500/20",
-                    isActive && "border-cyan-400 bg-cyan-400/20 ring-4 ring-cyan-400/20",
-                    isError && "border-rose-500 bg-rose-500/20",
-                    isPending && "border-slate-700 bg-slate-900",
-                    // Glow effect for active
-                    isActive && "shadow-[0_0_20px_rgba(34,211,238,0.4)]"
+                    "relative z-10 flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300",
+                    isCompleted && "bg-green-500 shadow-lg shadow-green-500/30",
+                    isActive && "bg-primary shadow-lg shadow-primary/30",
+                    isError && "bg-destructive shadow-lg shadow-destructive/30",
+                    isPending && "bg-muted border border-border"
                   )}
                 >
                   {isCompleted ? (
-                    <Check className="h-5 w-5 text-emerald-400" />
+                    <Check className="h-5 w-5 text-white" />
                   ) : isError ? (
-                    <AlertCircle className="h-5 w-5 text-rose-400" />
+                    <AlertCircle className="h-5 w-5 text-white" />
                   ) : isActive ? (
-                    <div className="relative">
-                      <Icon className="h-5 w-5 text-cyan-400" />
-                      {/* Pulse animation */}
-                      <span className="absolute inset-0 animate-ping rounded-full bg-cyan-400/30" />
-                    </div>
+                    <Icon className="h-5 w-5 text-primary-foreground" />
                   ) : (
-                    <Icon className={cn("h-5 w-5", isPending ? "text-slate-600" : "text-slate-400")} />
+                    <Icon className="h-5 w-5 text-muted-foreground" />
                   )}
                 </div>
 
@@ -84,20 +78,15 @@ export function StepIndicator({ className }: StepIndicatorProps) {
                   <p
                     className={cn(
                       "text-sm font-medium transition-colors",
-                      isCompleted && "text-emerald-400",
-                      isActive && "text-cyan-400",
-                      isError && "text-rose-400",
-                      isPending && "text-slate-500"
+                      isCompleted && "text-green-600 dark:text-green-400",
+                      isActive && "text-primary",
+                      isError && "text-destructive",
+                      isPending && "text-muted-foreground"
                     )}
                   >
                     {step.label}
                   </p>
-                  <p
-                    className={cn(
-                      "mt-0.5 text-xs",
-                      isActive ? "text-slate-400" : "text-slate-600"
-                    )}
-                  >
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     {step.description}
                   </p>
                 </div>
@@ -127,10 +116,10 @@ export function StepIndicatorCompact({ className }: StepIndicatorProps) {
             <div
               className={cn(
                 "h-2 w-2 rounded-full transition-all",
-                isCompleted && "bg-emerald-500",
-                isActive && "bg-cyan-400 ring-2 ring-cyan-400/30",
-                isError && "bg-rose-500",
-                !isCompleted && !isActive && !isError && "bg-slate-700"
+                isCompleted && "bg-green-500",
+                isActive && "bg-primary ring-2 ring-primary/30",
+                isError && "bg-red-500",
+                !isCompleted && !isActive && !isError && "bg-muted-foreground/30"
               )}
               title={`${step.label}: ${status}`}
             />
@@ -138,7 +127,7 @@ export function StepIndicatorCompact({ className }: StepIndicatorProps) {
               <div
                 className={cn(
                   "h-0.5 w-4",
-                  isCompleted ? "bg-emerald-500/50" : "bg-slate-800"
+                  isCompleted ? "bg-green-500/50" : "bg-muted"
                 )}
               />
             )}

@@ -1,0 +1,291 @@
+/**
+ * Flow Diagram CSS Variables
+ * Quick reference for all colors, spacing, and timing values
+ * Import this file or copy these variables to your project
+ */
+
+:root {
+    /* ============================================
+       COLOR PALETTE
+       ============================================ */
+
+    /* Background Colors */
+    --fd-bg-page: #fafbfc;
+    --fd-bg-card: #ffffff;
+    --fd-bg-code: #f6f8fa;
+
+    /* Node Colors */
+    --fd-node-bg: #ddf4ff;
+    --fd-node-border: #54aeff;
+    --fd-node-border-active: #0969da;
+    --fd-node-shadow-active: rgba(9, 105, 218, 0.15);
+    --fd-node-shadow-hover: rgba(9, 105, 218, 0.2);
+
+    /* Decision Node (Yellow) */
+    --fd-decision-bg: #fff8c5;
+    --fd-decision-border: #d4a72c;
+
+    /* Disabled Node (Gray) */
+    --fd-disabled-bg: #f6f8fa;
+    --fd-disabled-border: #d0d7de;
+
+    /* Code Box Colors */
+    --fd-code-bg: #f6f8fa;
+    --fd-code-border: #8250df;
+    --fd-code-border-hover: #6639ba;
+
+    /* Text Colors */
+    --fd-text-primary: #24292f;
+    --fd-text-secondary: #57606a;
+    --fd-text-muted: #8c959f;
+
+    /* Accent Colors */
+    --fd-accent-blue: #0969da;
+    --fd-accent-blue-dark: #0550ae;
+    --fd-accent-purple: #8250df;
+    --fd-accent-purple-dark: #6639ba;
+
+    /* Badge Colors */
+    --fd-badge-bg: rgba(9, 105, 218, 0.12);
+    --fd-badge-text: #0969da;
+
+    /* Info Icon Colors */
+    --fd-info-bg: rgba(130, 80, 223, 0.15);
+    --fd-info-text: #8250df;
+
+    /* Connection Line Colors */
+    --fd-line-main: #24292f;
+    --fd-line-code: #8250df;
+    --fd-line-dot: #24292f;
+
+    /* Border Colors */
+    --fd-border-light: #d0d7de;
+
+
+    /* ============================================
+       TYPOGRAPHY
+       ============================================ */
+
+    /* Font Families */
+    --fd-font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    --fd-font-mono: 'SF Mono', 'Monaco', 'Courier New', monospace;
+
+    /* Font Sizes */
+    --fd-text-h1: 2.2rem;
+    --fd-text-h2: 1.5rem;
+    --fd-text-h3: 1rem;
+    --fd-text-body: 0.85rem;
+    --fd-text-small: 0.8rem;
+    --fd-text-badge: 0.7rem;
+    --fd-text-code: 0.75rem;
+
+    /* Font Weights */
+    --fd-weight-normal: 400;
+    --fd-weight-medium: 500;
+    --fd-weight-semibold: 600;
+
+    /* Line Heights */
+    --fd-line-height-body: 1.3;
+    --fd-line-height-code: 1.5;
+
+
+    /* ============================================
+       SPACING & SIZING
+       ============================================ */
+
+    /* Container */
+    --fd-container-max-width: 1800px;
+    --fd-container-min-height: 1800px;
+    --fd-container-padding: 2rem;
+
+    /* Node Dimensions */
+    --fd-node-min-width: 200px;
+    --fd-node-max-width: 260px;
+    --fd-node-padding: 1.2rem 1.5rem;
+    --fd-node-border-width: 2px;
+    --fd-node-border-radius: 8px;
+
+    /* Code Box Dimensions */
+    --fd-code-max-width: 350px;
+    --fd-code-max-height: 320px;
+    --fd-code-padding: 1rem;
+    --fd-code-padding-top: 2.5rem;
+    --fd-code-border-width: 2px;
+    --fd-code-border-radius: 6px;
+
+    /* Badge */
+    --fd-badge-padding: 0.25rem 0.6rem;
+    --fd-badge-radius: 12px;
+    --fd-badge-margin-top: 0.5rem;
+
+    /* Info Icon */
+    --fd-info-size: 20px;
+    --fd-info-radius: 50%;
+    --fd-info-position: 0.5rem;
+
+    /* Close Button */
+    --fd-close-padding: 0.25rem 0.6rem;
+    --fd-close-radius: 4px;
+    --fd-close-position: 0.5rem;
+
+    /* Connection Dots */
+    --fd-dot-radius: 6;
+
+    /* Spacing */
+    --fd-vertical-spacing: 200px;        /* Min vertical gap between nodes */
+    --fd-vertical-spacing-max: 240px;    /* Max vertical gap between nodes */
+
+
+    /* ============================================
+       ANIMATIONS & TRANSITIONS
+       ============================================ */
+
+    /* Transition Durations */
+    --fd-transition-fast: 0.2s;
+    --fd-transition-normal: 0.3s;
+    --fd-transition-slow: 0.4s;
+
+    /* Transition Timings */
+    --fd-ease: ease;
+    --fd-ease-in-out: ease-in-out;
+
+    /* Animation Durations */
+    --fd-animation-dash: 40s;            /* Line dash animation */
+    --fd-animation-pulse: 2s;            /* Info icon pulse */
+    --fd-animation-autoplay: 2500ms;     /* Auto-play step interval */
+
+    /* Transform Values */
+    --fd-scale-invisible: 0.8;
+    --fd-scale-normal: 1;
+    --fd-scale-hover: 1.02;
+    --fd-scale-pulse-max: 1.1;
+
+    /* Opacity Values */
+    --fd-opacity-invisible: 0;
+    --fd-opacity-line: 0.6;
+    --fd-opacity-line-code: 0.4;
+    --fd-opacity-disabled: 0.5;
+    --fd-opacity-pulse-min: 0.7;
+
+
+    /* ============================================
+       CONNECTION LINES
+       ============================================ */
+
+    /* Line Properties */
+    --fd-line-width: 2;
+    --fd-line-dash: 5 5;
+    --fd-line-dash-offset: -1000;
+
+    /* Curve Intensity */
+    --fd-curve-intensity: 0.5;           /* 50% of distance for smooth curves */
+    --fd-curve-horizontal-offset: 0.3;   /* 30% for vertical connections */
+
+
+    /* ============================================
+       SHADOWS & EFFECTS
+       ============================================ */
+
+    /* Box Shadows */
+    --fd-shadow-hover: 0 2px 8px rgba(9, 105, 218, 0.2);
+    --fd-shadow-active: 0 0 0 3px rgba(9, 105, 218, 0.15);
+    --fd-shadow-controls: 0 -2px 8px rgba(0, 0, 0, 0.05);
+
+
+    /* ============================================
+       Z-INDEX LAYERS
+       ============================================ */
+
+    --fd-z-connections: 1;
+    --fd-z-code-box: 5;
+    --fd-z-node: 10;
+    --fd-z-code-visible: 15;
+    --fd-z-controls: 100;
+
+
+    /* ============================================
+       SCROLLBAR (Code Boxes)
+       ============================================ */
+
+    --fd-scrollbar-width: 10px;
+    --fd-scrollbar-track: #d0d7de;
+    --fd-scrollbar-thumb: #8250df;
+    --fd-scrollbar-thumb-hover: #6639ba;
+    --fd-scrollbar-radius: 5px;
+
+
+    /* ============================================
+       BUTTON STYLES
+       ============================================ */
+
+    /* Button Sizing */
+    --fd-btn-padding: 0.6rem 1.5rem;
+    --fd-btn-radius: 6px;
+    --fd-btn-font-size: 0.9rem;
+
+    /* Button Colors */
+    --fd-btn-bg: #ffffff;
+    --fd-btn-border: #d0d7de;
+    --fd-btn-text: #24292f;
+    --fd-btn-hover-bg: #f6f8fa;
+    --fd-btn-hover-border: #0969da;
+
+    /* Primary Button */
+    --fd-btn-primary-bg: #0969da;
+    --fd-btn-primary-border: #0969da;
+    --fd-btn-primary-text: #ffffff;
+    --fd-btn-primary-hover-bg: #0550ae;
+    --fd-btn-primary-hover-border: #0550ae;
+
+
+    /* ============================================
+       RESPONSIVE BREAKPOINT
+       ============================================ */
+
+    --fd-breakpoint-mobile: 1200px;
+}
+
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.fd-hide-on-mobile {
+    display: block;
+}
+
+@media (max-width: 1200px) {
+    .fd-hide-on-mobile {
+        display: none;
+    }
+}
+
+
+/* ============================================
+   USAGE EXAMPLES
+   ============================================ */
+
+/*
+Example: Apply to a node
+.my-node {
+    background: var(--fd-node-bg);
+    border: var(--fd-node-border-width) solid var(--fd-node-border);
+    border-radius: var(--fd-node-border-radius);
+    padding: var(--fd-node-padding);
+    transition: all var(--fd-transition-slow) var(--fd-ease);
+}
+
+Example: Apply to a code box
+.my-code-box {
+    background: var(--fd-code-bg);
+    border: var(--fd-code-border-width) dashed var(--fd-code-border);
+    max-width: var(--fd-code-max-width);
+    font-family: var(--fd-font-mono);
+    font-size: var(--fd-text-code);
+}
+
+Example: Apply animation
+.my-line {
+    animation: dash var(--fd-animation-dash) linear infinite;
+}
+*/

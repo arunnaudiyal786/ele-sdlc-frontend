@@ -27,11 +27,11 @@ export default function PipelineLayout({ children }: PipelineLayoutProps) {
             </Link>
           </Button>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/20 to-violet-500/20 border border-cyan-500/30">
-              <Database className="h-5 w-5 text-cyan-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
+              <Database className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold tracking-tight text-slate-100">
+              <h1 className="text-xl font-semibold tracking-tight">
                 {jobId ? `Pipeline Job` : 'New Pipeline'}
               </h1>
               {jobId && (
@@ -42,7 +42,7 @@ export default function PipelineLayout({ children }: PipelineLayoutProps) {
         </div>
 
         {/* Step indicator */}
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
+        <div className="rounded-xl border bg-muted/30 p-6 shadow-sm">
           <StepIndicator />
         </div>
 

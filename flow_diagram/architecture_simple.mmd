@@ -1,0 +1,59 @@
+%% Simple Architecture Diagram
+%% SDLC AI Impact Assessment System
+%% Render at: https://mermaid.live/
+
+graph TB
+    subgraph "User Interface"
+        User[👤 User]
+        UI[Next.js Frontend<br/>Port 3000<br/>React 19 + TypeScript]
+    end
+
+    subgraph "Backend Services"
+        API[FastAPI Server<br/>Port 8000<br/>Python 3.10+]
+        Workflow[LangGraph Orchestrator<br/>Multi-Agent Pipeline]
+    end
+
+    subgraph "AI/ML Layer"
+        Ollama[Ollama LLM Runtime<br/>Port 11434]
+        PHI3[phi3:mini<br/>Text Generation]
+        MINILM[all-minilm<br/>Embeddings 384-dim]
+    end
+
+    subgraph "Data Layer"
+        VectorDB[(ChromaDB<br/>Vector Store)]
+        Sessions[(Session Storage<br/>Audit Trails)]
+        RawData[(Source Data<br/>CSV Files)]
+    end
+
+    User -->|Submit Requirement| UI
+    UI -->|HTTP POST /api/v1/orchestrator/run| API
+    API --> Workflow
+
+    Workflow -->|Agent 1: Extract Keywords| PHI3
+    Workflow -->|Agent 2: Semantic Search| MINILM
+    Workflow -->|Agent 4-7: LLM Analysis| PHI3
+
+    PHI3 -.->|Inference Requests| Ollama
+    MINILM -.->|Embedding Requests| Ollama
+
+    Workflow -->|Hybrid Search| VectorDB
+    VectorDB -->|Retrieve Matches| Workflow
+
+    Workflow -->|Save Artifacts| Sessions
+    Workflow -->|Read Historical| RawData
+
+    API -->|Stream Progress (SSE)| UI
+    API -->|Return Results (JSON)| UI
+
+    UI -->|Display Dashboard| User
+
+    %% Styling
+    classDef frontend fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+    classDef backend fill:#dcfce7,stroke:#166534,stroke-width:2px
+    classDef ai fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+    classDef data fill:#e0e7ff,stroke:#4f46e5,stroke-width:2px
+
+    class User,UI frontend
+    class API,Workflow backend
+    class Ollama,PHI3,MINILM ai
+    class VectorDB,Sessions,RawData data
