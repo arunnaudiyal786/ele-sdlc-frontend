@@ -1,7 +1,7 @@
 "use client"
 
-import Link from "next/link"
 import { Calculator, ArrowLeft, ArrowRight, TrendingUp, Clock, Users } from "lucide-react"
+import { useWizard } from "@/contexts/wizard-context"
 import { useSDLC } from "@/contexts/sdlc-context"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,44 +21,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { NoAssessmentState } from "@/components/sdlc/no-assessment-state"
-import { TechInfoBox, TECH_INFO } from "@/components/sdlc/tech-info-box"
 
-export default function EstimationSheetPage() {
-  const { pipeline, isAgentComplete } = useSDLC()
-  const isComplete = isAgentComplete('estimationSheet')
+export function EstimationResult() {
+  const { setCurrentStep } = useWizard()
+  const { pipeline } = useSDLC()
   const estimation = pipeline.estimationEffort
   const modules = pipeline.impactedModules
 
-  if (!isComplete || !estimation) {
+  if (!estimation) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-            <Calculator className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Estimation Sheet</h1>
-            <p className="text-sm text-muted-foreground">
-              View effort estimations and resource planning
-            </p>
-          </div>
-        </div>
-
-        <NoAssessmentState
-          icon={Calculator}
-          title="No estimation data available yet."
-          description="Run an impact assessment to generate estimates."
-          asLink
-        />
+      <div className="flex flex-col items-center justify-center py-12">
+        <p className="text-muted-foreground">No estimation data available.</p>
       </div>
     )
-  }
-
-  const confidenceColor = {
-    HIGH: 'text-green-500 bg-green-500/10',
-    MEDIUM: 'text-yellow-500 bg-yellow-500/10',
-    LOW: 'text-red-500 bg-red-500/10',
   }
 
   return (
@@ -92,35 +67,34 @@ export default function EstimationSheetPage() {
               <div>
                 <h3 className="text-base font-semibold mb-1">Estimation Algorithm</h3>
                 <p className="text-sm text-muted-foreground">
-                  LLM-powered estimation using Ollama phi3:mini model to analyze context from previous pipeline steps
+                  Uses AI to analyze historical project data and complexity to generate accurate effort estimates
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-3 text-sm">
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">Context Assembly</div>
+                  <div className="font-bold text-primary">AI Analysis</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    Combines impacted modules (functional + technical) and top 3 historical matches with actual effort data
+                    LLM analyzes historical matches and impacted modules to calculate effort
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">LLM Generation</div>
+                  <div className="font-bold text-primary">Smart Breakdown</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    Ollama generates effort breakdown with dev hours, QA hours, story points, and confidence level
+                    Automatically distributes hours across dev, QA, and story points by category
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">JSON Parsing</div>
+                  <div className="font-bold text-primary">Confidence Score</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    Auto-repairs malformed LLM JSON output to ensure valid structured data
+                    Provides confidence level based on similarity to historical projects
                   </p>
                 </div>
               </div>
               <div className="border-t border-primary/10 pt-3">
                 <p className="text-sm text-muted-foreground">
-                  <strong className="text-foreground">How it works:</strong> The AI examines the requirement text, impacted modules (top 5 functional + top 5 technical with impact levels),
-                  and historical project data (top 3 matches with actual hours worked). The LLM generates effort breakdown by category (Frontend, Backend, Database, Integration, Testing)
-                  with dev hours, QA hours, and story points. Confidence reflects historical data quality: HIGH means multiple similar projects with actual hours were found;
-                  MEDIUM indicates some historical data with assumptions; LOW means limited historical data, estimate based on complexity analysis.
+                  <strong className="text-foreground">How it works:</strong> The AI examines similar past projects and impacted modules to estimate effort.
+                  It generates dev hours, QA hours, and story points with a category-wise breakdown.
+                  Higher confidence means more similar historical projects were found to base the estimate on.
                 </p>
               </div>
             </div>
@@ -130,17 +104,13 @@ export default function EstimationSheetPage() {
 
       {/* Navigation */}
       <div className="flex justify-between">
-        <Button asChild variant="outline">
-          <Link href="/sdlc-intelligence/historical-matches">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Historical Matches
-          </Link>
+        <Button variant="outline" onClick={() => setCurrentStep('complete')}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back
         </Button>
-        <Button asChild>
-          <Link href="/sdlc-intelligence/tdd-generation">
-            Next: TDD Generation
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
+        <Button onClick={() => setCurrentStep('tdd')}>
+          Next: TDD Generation
+          <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
 

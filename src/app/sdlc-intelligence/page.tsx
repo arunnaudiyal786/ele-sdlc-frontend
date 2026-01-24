@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Brain, Loader2, AlertCircle, CheckCircle2, ArrowRight, FileText, Circle } from "lucide-react"
+import { Brain, Loader2, AlertCircle, CheckCircle2, ArrowRight, FileText, Circle, Calculator, FileCode, ListTodo } from "lucide-react"
 import { useSDLC } from "@/contexts/sdlc-context"
 import { AGENTS } from "@/lib/api"
 import { Button } from "@/components/ui/button"
@@ -236,51 +236,180 @@ export default function SDLCIntelligencePage() {
         </Card>
       ) : (
         // Completed State
-        <Card className="border-green-500">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-600">
-              <CheckCircle2 className="h-5 w-5" />
-              Assessment Complete
-            </CardTitle>
-            <CardDescription>
-              Impact assessment has been generated successfully
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Summary Stats */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="rounded-lg border p-3 text-center">
-                <p className="text-2xl font-bold">
-                  {pipeline.impactedModules?.total_modules || 0}
-                </p>
-                <p className="text-xs text-muted-foreground">Modules Impacted</p>
+        <>
+          <Card className="border-green-500">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-green-600">
+                <CheckCircle2 className="h-5 w-5" />
+                Assessment Complete
+              </CardTitle>
+              <CardDescription>
+                Impact assessment has been generated successfully
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Summary Stats */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="rounded-lg border p-3 text-center">
+                  <p className="text-2xl font-bold">
+                    {pipeline.impactedModules?.total_modules || 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Modules Impacted</p>
+                </div>
+                <div className="rounded-lg border p-3 text-center">
+                  <p className="text-2xl font-bold">
+                    {pipeline.estimationEffort?.total_hours || 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Total Hours</p>
+                </div>
+                <div className="rounded-lg border p-3 text-center">
+                  <p className="text-2xl font-bold">
+                    {pipeline.jiraStories?.story_count || 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Jira Stories</p>
+                </div>
               </div>
-              <div className="rounded-lg border p-3 text-center">
-                <p className="text-2xl font-bold">
-                  {pipeline.estimationEffort?.total_hours || 0}
-                </p>
-                <p className="text-xs text-muted-foreground">Total Hours</p>
-              </div>
-              <div className="rounded-lg border p-3 text-center">
-                <p className="text-2xl font-bold">
-                  {pipeline.jiraStories?.story_count || 0}
-                </p>
-                <p className="text-xs text-muted-foreground">Jira Stories</p>
-              </div>
-            </div>
 
-            {/* Actions */}
-            <div className="flex gap-3">
-              <Button onClick={handleViewResults} className="flex-1">
-                View Results
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button onClick={handleReset} variant="outline">
-                New Assessment
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              {/* Actions */}
+              <div className="flex gap-3">
+                <Button onClick={handleViewResults} className="flex-1">
+                  View Results
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button onClick={handleReset} variant="outline">
+                  New Assessment
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Estimation Sheet Preview */}
+          {pipeline.estimationEffort && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                      <Calculator className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle>Estimation Sheet</CardTitle>
+                      <CardDescription>
+                        AI-powered effort estimation using historical data patterns
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <Button asChild variant="outline" size="sm">
+                    <a href="/sdlc-intelligence/estimation-sheet">
+                      View Details
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </a>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="rounded-lg border p-3 text-center">
+                    <p className="text-xl font-bold">{pipeline.estimationEffort.total_hours}</p>
+                    <p className="text-xs text-muted-foreground">Total Hours</p>
+                  </div>
+                  <div className="rounded-lg border p-3 text-center">
+                    <p className="text-xl font-bold">{pipeline.estimationEffort.total_dev_hours}</p>
+                    <p className="text-xs text-muted-foreground">Dev Hours</p>
+                  </div>
+                  <div className="rounded-lg border p-3 text-center">
+                    <p className="text-xl font-bold">{pipeline.estimationEffort.total_qa_hours}</p>
+                    <p className="text-xs text-muted-foreground">QA Hours</p>
+                  </div>
+                  <div className="rounded-lg border p-3 text-center">
+                    <p className="text-xl font-bold">{pipeline.estimationEffort.story_points}</p>
+                    <p className="text-xs text-muted-foreground">Story Points</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* TDD Generation Preview */}
+          {pipeline.tdd && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                      <FileCode className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle>TDD Generation</CardTitle>
+                      <CardDescription>
+                        AI-generated Technical Design Document
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <Button asChild variant="outline" size="sm">
+                    <a href="/sdlc-intelligence/tdd-generation">
+                      View Details
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </a>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium mb-2">Architecture Pattern</p>
+                    <p className="text-sm text-muted-foreground">{pipeline.tdd.architecture_pattern}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-2">Components</p>
+                    <p className="text-sm text-muted-foreground">
+                      {pipeline.tdd.technical_components.length} technical components defined
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Jira Stories Preview */}
+          {pipeline.jiraStories && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                      <ListTodo className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle>Jira Stories</CardTitle>
+                      <CardDescription>
+                        AI-decomposed user stories and tasks ready for your backlog
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <Button asChild variant="outline" size="sm">
+                    <a href="/sdlc-intelligence/jira-stories">
+                      View Details
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </a>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-lg border p-3 text-center">
+                    <p className="text-2xl font-bold">{pipeline.jiraStories.story_count}</p>
+                    <p className="text-xs text-muted-foreground">Total Stories</p>
+                  </div>
+                  <div className="rounded-lg border p-3 text-center">
+                    <p className="text-2xl font-bold">{pipeline.jiraStories.total_story_points}</p>
+                    <p className="text-xs text-muted-foreground">Story Points</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </>
       )}
     </div>
   )

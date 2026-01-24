@@ -1,7 +1,7 @@
 "use client"
 
-import Link from "next/link"
-import { ListTodo, ArrowLeft, CheckCircle2, AlertTriangle, Bug, Lightbulb } from "lucide-react"
+import { ListTodo, ArrowLeft, CheckCircle2, Bug, Lightbulb } from "lucide-react"
+import { useWizard } from "@/contexts/wizard-context"
 import { useSDLC } from "@/contexts/sdlc-context"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,8 +18,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { ChevronDown } from "lucide-react"
-import { NoAssessmentState } from "@/components/sdlc/no-assessment-state"
-import { TechInfoBox, TECH_INFO } from "@/components/sdlc/tech-info-box"
 
 const storyTypeIcons = {
   Story: ListTodo,
@@ -34,34 +32,15 @@ const priorityColors = {
   LOW: 'bg-green-500/10 text-green-500 border-green-500/20',
 }
 
-export default function JiraStoriesPage() {
-  const { pipeline, isAgentComplete } = useSDLC()
-  const isComplete = isAgentComplete('jiraStories')
+export function JiraResult() {
+  const { setCurrentStep, resetWizard } = useWizard()
+  const { pipeline } = useSDLC()
   const jiraData = pipeline.jiraStories
-  const codeImpact = pipeline.codeImpact
-  const risks = pipeline.risks
 
-  if (!isComplete || !jiraData) {
+  if (!jiraData) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-            <ListTodo className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Jira Stories</h1>
-            <p className="text-sm text-muted-foreground">
-              Generated user stories and tasks
-            </p>
-          </div>
-        </div>
-
-        <NoAssessmentState
-          icon={ListTodo}
-          title="No Jira stories available yet."
-          description="Run an impact assessment to generate stories."
-          asLink
-        />
+      <div className="flex flex-col items-center justify-center py-12">
+        <p className="text-muted-foreground">No Jira stories data available.</p>
       </div>
     )
   }
@@ -99,36 +78,34 @@ export default function JiraStoriesPage() {
               <div>
                 <h3 className="text-base font-semibold mb-1">Jira Story Generation Algorithm</h3>
                 <p className="text-sm text-muted-foreground">
-                  Final pipeline stage that synthesizes all previous outputs into structured, backlog-ready Jira stories with type normalization
+                  Intelligently breaks down requirements into actionable user stories with acceptance criteria
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-3 text-sm">
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">Context Synthesis</div>
+                  <div className="font-bold text-primary">Smart Decomposition</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    Formats top 5 modules (name only), effort summary (dev/QA hours, points), and TDD (architecture + top 5 components)
+                    AI analyzes TDD and estimation to create Stories, Tasks, and Spikes based on work nature
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">LLM Generation</div>
+                  <div className="font-bold text-primary">Story Sizing</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    Ollama generates stories with title, description, type, points (1-13), priority (HIGH/MEDIUM/LOW), acceptance criteria, and labels
+                    Automatically assigns story points aligned with effort estimation breakdown
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">Type Normalization</div>
+                  <div className="font-bold text-primary">Acceptance Criteria</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    Auto-maps LLM variations (Feature→Story, Technical Task→Task, Investigation→Spike) to valid Jira types
+                    Generates clear acceptance criteria derived from requirements and technical design
                   </p>
                 </div>
               </div>
               <div className="border-t border-primary/10 pt-3">
                 <p className="text-sm text-muted-foreground">
-                  <strong className="text-foreground">How it works:</strong> As the final pipeline stage, the AI acts as an Agile project manager, synthesizing all prior outputs: requirement text, impacted modules,
-                  effort estimate, and TDD (architecture + components). The LLM generates 10 backlog-ready stories as vertical slices (end-to-end functionality).
-                  Each story includes: title, description, type (Story for user features, Task for technical work, Spike for research/investigation), story points (1-13 Fibonacci scale),
-                  priority (HIGH/MEDIUM/LOW), and testable acceptance criteria. Stories &gt; 13 points should be split. The total story points approximately match the effort estimate.
-                  Type normalization maps LLM variations (Feature→Story, Technical Task→Task, Investigation→Spike) to valid Jira types.
+                  <strong className="text-foreground">How it works:</strong> The AI examines the TDD, estimation breakdown, and impacted modules to decompose work.
+                  It creates properly sized stories with descriptions, acceptance criteria, and priorities.
+                  Story types (Story/Task/Spike) are automatically determined based on the nature of work, and story points are distributed to match the effort estimate.
                 </p>
               </div>
             </div>
@@ -138,16 +115,12 @@ export default function JiraStoriesPage() {
 
       {/* Navigation */}
       <div className="flex justify-between">
-        <Button asChild variant="outline">
-          <Link href="/sdlc-intelligence/tdd-generation">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            TDD Generation
-          </Link>
+        <Button variant="outline" onClick={() => setCurrentStep('tdd')}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          TDD Generation
         </Button>
-        <Button asChild>
-          <Link href="/sdlc-intelligence">
-            New Assessment
-          </Link>
+        <Button onClick={resetWizard}>
+          New Assessment
         </Button>
       </div>
 
@@ -242,78 +215,6 @@ export default function JiraStoriesPage() {
           })}
         </CardContent>
       </Card>
-
-      {/* Risks Section */}
-      {risks && risks.risks.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-orange-500" />
-              Identified Risks
-            </CardTitle>
-            <CardDescription>
-              {risks.total_risks} risks identified, {risks.high_severity_count} high severity
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {risks.risks.map((risk) => (
-                <div key={risk.risk_id} className="p-4 rounded-lg border">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium">{risk.title}</h4>
-                    <div className="flex gap-2">
-                      <Badge variant={risk.severity === 'HIGH' ? 'destructive' : risk.severity === 'MEDIUM' ? 'default' : 'secondary'}>
-                        {risk.severity}
-                      </Badge>
-                      <Badge variant="outline">{risk.category}</Badge>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3">{risk.description}</p>
-                  <div className="text-sm">
-                    <span className="font-medium">Mitigation: </span>
-                    <span className="text-muted-foreground">{risk.mitigation}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Code Impact Section */}
-      {codeImpact && codeImpact.files.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Code Impact</CardTitle>
-            <CardDescription>
-              {codeImpact.total_files} files across {codeImpact.repositories_affected.length} repositories
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {codeImpact.files.slice(0, 10).map((file) => (
-                <div key={file.file_id} className="flex items-center justify-between p-3 rounded-lg border text-sm">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <Badge variant={file.change_type === 'new' ? 'default' : file.change_type === 'modified' ? 'secondary' : 'destructive'}>
-                      {file.change_type}
-                    </Badge>
-                    <code className="truncate text-xs">{file.file_path}</code>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Badge variant="outline">{file.language}</Badge>
-                    <span className="text-muted-foreground">~{file.estimated_lines} lines</span>
-                  </div>
-                </div>
-              ))}
-              {codeImpact.files.length > 10 && (
-                <p className="text-sm text-muted-foreground text-center py-2">
-                  And {codeImpact.files.length - 10} more files...
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   )
 }

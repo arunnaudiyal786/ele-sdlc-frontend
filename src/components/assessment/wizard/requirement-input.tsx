@@ -1,6 +1,6 @@
 "use client"
 
-import { Upload, Link2, Loader2 } from "lucide-react"
+import { Upload, Link2, Loader2, FileText } from "lucide-react"
 import { useWizard } from "@/contexts/wizard-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,6 +26,20 @@ export function RequirementInput() {
     }
   }
 
+  const handleLoadSample = async () => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      const response = await fetch(`${apiUrl}/api/v1/samples/requirement`)
+      if (response.ok) {
+        const data = await response.json()
+        setRequirementText(data.requirement_text || '')
+        setEpicId(data.jira_epic_id || '')
+      }
+    } catch (error) {
+      console.error('Failed to load sample:', error)
+    }
+  }
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <Card>
@@ -39,7 +53,19 @@ export function RequirementInput() {
         <CardContent className="space-y-6">
           {/* Requirement Text */}
           <div className="space-y-2">
-            <Label htmlFor="requirement">Requirement Description</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="requirement">Requirement Description</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleLoadSample}
+                className="h-7 text-xs"
+              >
+                <FileText className="mr-1 h-3 w-3" />
+                Load Sample Input
+              </Button>
+            </div>
             <Textarea
               id="requirement"
               placeholder="Describe the requirement in detail. Include functionality, user stories, technical considerations, and any constraints..."

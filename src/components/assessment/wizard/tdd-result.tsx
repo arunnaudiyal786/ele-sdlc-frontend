@@ -1,7 +1,7 @@
 "use client"
 
-import Link from "next/link"
 import { FileCode, ArrowLeft, ArrowRight, Layers, GitBranch, Shield, Database } from "lucide-react"
+import { useWizard } from "@/contexts/wizard-context"
 import { useSDLC } from "@/contexts/sdlc-context"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,42 +12,22 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { NoAssessmentState } from "@/components/sdlc/no-assessment-state"
-import { TechInfoBox, TECH_INFO } from "@/components/sdlc/tech-info-box"
 
-export default function TDDGenerationPage() {
-  const { pipeline, isAgentComplete } = useSDLC()
-  const isComplete = isAgentComplete('tddGeneration')
+export function TDDResult() {
+  const { setCurrentStep } = useWizard()
+  const { pipeline } = useSDLC()
   const tdd = pipeline.tdd
 
-  if (!isComplete || !tdd) {
+  if (!tdd) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-            <FileCode className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">TDD Generation</h1>
-            <p className="text-sm text-muted-foreground">
-              Technical Design Document generation
-            </p>
-          </div>
-        </div>
-
-        <NoAssessmentState
-          icon={FileCode}
-          title="No TDD available yet."
-          description="Run an impact assessment to generate the Technical Design Document."
-          asLink
-        />
+      <div className="flex flex-col items-center justify-center py-12">
+        <p className="text-muted-foreground">No TDD data available.</p>
       </div>
     )
   }
@@ -81,36 +61,34 @@ export default function TDDGenerationPage() {
               <div>
                 <h3 className="text-base font-semibold mb-1">TDD Generation Algorithm</h3>
                 <p className="text-sm text-muted-foreground">
-                  Multi-stage LLM pipeline that synthesizes modules, effort estimates, and historical TDDs into comprehensive technical design
+                  Creates comprehensive technical design by learning from similar past implementations
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-3 text-sm">
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">Context Building</div>
+                  <div className="font-bold text-primary">Pattern Learning</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    Formats modules (with impact and reason), effort summary (dev/QA hours, points, confidence), and top 3 historical matches
+                    AI analyzes architecture patterns from similar historical TDDs to suggest best approach
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">LLM Synthesis</div>
+                  <div className="font-bold text-primary">Tech Stack</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    Ollama generates structured JSON with architecture pattern, components, dependencies, security, and performance requirements
+                    Recommends components and dependencies based on proven past implementations
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">Markdown Generation</div>
+                  <div className="font-bold text-primary">Design Decisions</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    Auto-generates formatted markdown document with all sections, modules, effort data, and metadata
+                    Generates detailed design with security, performance, and scalability considerations
                   </p>
                 </div>
               </div>
               <div className="border-t border-primary/10 pt-3">
                 <p className="text-sm text-muted-foreground">
-                  <strong className="text-foreground">How it works:</strong> The AI synthesizes data from all prior pipeline steps: requirement text, impacted modules (with impact level and reasoning),
-                  effort estimate (dev/QA hours, story points, confidence), and similar historical projects (epic name, description, match score).
-                  The LLM acts as a software architect, generating a comprehensive TDD with: descriptive name, 2-3 paragraph technical overview, architecture pattern (e.g., Microservices, CQRS, Adapter Pattern),
-                  technology stack components, key design decisions with rationale, security requirements (OAuth, encryption, rate limiting), performance SLAs (latency, throughput, uptime), and external dependencies.
-                  Output is saved as both structured JSON and a formatted markdown document (tdd.md) in the session audit trail.
+                  <strong className="text-foreground">How it works:</strong> The AI examines similar TDDs from historical matches and your requirement details.
+                  It suggests proven architecture patterns, technical components, and dependencies.
+                  The output includes design decisions, data flow, API contracts, and deployment considerations in a structured markdown format.
                 </p>
               </div>
             </div>
@@ -120,17 +98,13 @@ export default function TDDGenerationPage() {
 
       {/* Navigation */}
       <div className="flex justify-between">
-        <Button asChild variant="outline">
-          <Link href="/sdlc-intelligence/estimation-sheet">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Estimation Sheet
-          </Link>
+        <Button variant="outline" onClick={() => setCurrentStep('estimation')}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Estimation Sheet
         </Button>
-        <Button asChild>
-          <Link href="/sdlc-intelligence/jira-stories">
-            Next: Jira Stories
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
+        <Button onClick={() => setCurrentStep('jira')}>
+          Next: Jira Stories
+          <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
 

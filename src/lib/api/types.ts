@@ -1,4 +1,11 @@
 // Backend API Types - matching ele-sdlc-backend schemas
+//
+// IMPORTANT: Backend uses on-demand document retrieval architecture:
+// - Single project_index ChromaDB collection (not 5 separate collections)
+// - Historical match returns ProjectMatch objects converted to MatchResult for backward compatibility
+// - Auto-select node loads full TDD, estimation, and jira_stories documents on-demand
+// - Agents receive loaded_projects containing parsed documents
+// - All agent response types now include session_id, agent, and generated_at fields
 
 // Pipeline Status - matches backend status progression
 export type PipelineStatus =
@@ -38,11 +45,14 @@ export interface ImpactedModule {
   reason: string
 }
 
-// Impacted Modules Output
+// Impacted Modules Output - matches backend ImpactedModulesResponse
 export interface ImpactedModulesOutput {
+  session_id: string
+  agent: string
   functional_modules: ImpactedModule[]
   technical_modules: ImpactedModule[]
   total_modules: number
+  generated_at: string
 }
 
 // Effort Breakdown - matches backend EffortBreakdown model
@@ -53,14 +63,17 @@ export interface EffortBreakdown {
   description: string
 }
 
-// Estimation Effort Output
+// Estimation Effort Output - matches backend EstimationEffortResponse
 export interface EstimationEffortOutput {
+  session_id: string
+  agent: string
   total_dev_hours: number
   total_qa_hours: number
   total_hours: number
   story_points: number
   confidence: 'HIGH' | 'MEDIUM' | 'LOW'
   breakdown: EffortBreakdown[]
+  generated_at: string
   notes?: string
 }
 
@@ -93,11 +106,14 @@ export interface JiraStory {
   labels?: string[]
 }
 
-// Jira Stories Output
+// Jira Stories Output - matches backend JiraStoriesResponse
 export interface JiraStoriesOutput {
+  session_id: string
+  agent: string
   stories: JiraStory[]
-  total_story_points: number
   story_count: number
+  total_story_points: number
+  generated_at: string
 }
 
 // Code Impact File
@@ -111,12 +127,14 @@ export interface CodeImpactFile {
   estimated_lines: number
 }
 
-// Code Impact Output
+// Code Impact Output - matches backend CodeImpactResponse
 export interface CodeImpactOutput {
+  session_id: string
+  agent: string
   files: CodeImpactFile[]
-  repositories_affected: string[]
   total_files: number
-  total_estimated_lines: number
+  repositories_affected: string[]
+  generated_at: string
 }
 
 // Risk
@@ -130,11 +148,14 @@ export interface Risk {
   mitigation: string
 }
 
-// Risks Output
+// Risks Output - matches backend RisksResponse
 export interface RisksOutput {
+  session_id: string
+  agent: string
   risks: Risk[]
-  high_severity_count: number
   total_risks: number
+  high_severity_count: number
+  generated_at: string
 }
 
 // Pipeline Request

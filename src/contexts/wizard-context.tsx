@@ -46,7 +46,7 @@ export function useWizard() {
   return context
 }
 
-const stepOrder: WizardStep[] = ['input', 'matches', 'results']
+const stepOrder: WizardStep[] = ['input', 'matches', 'complete', 'estimation', 'tdd', 'jira']
 
 const initialState: WizardState = {
   currentStep: 'input',
@@ -116,16 +116,37 @@ export function WizardProvider({ children }: WizardProviderProps) {
     cleanupRef.current = cleanup
   }, [runImpactPipeline, state.requirementText, state.epicId])
 
-  // Watch for pipeline completion to navigate to results
+  // Watch for pipeline completion to navigate to complete page
   React.useEffect(() => {
-    if (state.isAnalyzing && !streaming.isStreaming && pipeline.status === 'completed') {
-      // Pipeline finished - navigate to results
+    // Check if historical matching agents are complete (auto_select is the last one)
+    const areHistoricalMatchesComplete =
+      pipeline.status === 'matches_selected' ||
+      pipeline.status === 'impacted_modules_generated' ||
+      pipeline.status === 'estimation_effort_completed' ||
+      pipeline.status === 'tdd_generated' ||
+      pipeline.status === 'jira_stories_generated' ||
+      pipeline.status === 'completed'
+
+    // Check if pipeline is complete (either status is 'completed' or last agent status)
+    const isPipelineComplete = pipeline.status === 'completed' ||
+                                pipeline.status === 'jira_stories_generated'
+
+    // Auto-advance from 'matches' step to 'complete' step once historical matching is done
+    if (state.isAnalyzing && state.currentStep === 'matches' && areHistoricalMatchesComplete) {
+      setState(prev => ({
+        ...prev,
+        currentStep: 'complete',
+      }))
+    }
+
+    if (state.isAnalyzing && !streaming.isStreaming && isPipelineComplete) {
+      // Pipeline finished - navigate to complete page
       setAssessmentResult(sampleAssessmentResult) // Using mock for now, real data comes from SDLC context
       setState(prev => ({
         ...prev,
         isAnalyzing: false,
         analysisProgress: 100,
-        currentStep: 'results',
+        currentStep: 'complete',
       }))
     } else if (state.isAnalyzing && !streaming.isStreaming && pipeline.status === 'error') {
       // Pipeline errored
@@ -135,7 +156,7 @@ export function WizardProvider({ children }: WizardProviderProps) {
         analysisProgress: 0,
       }))
     }
-  }, [state.isAnalyzing, streaming.isStreaming, pipeline.status])
+  }, [state.isAnalyzing, state.currentStep, streaming.isStreaming, pipeline.status])
 
   // Cleanup on unmount
   React.useEffect(() => {

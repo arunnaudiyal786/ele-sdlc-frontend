@@ -29,8 +29,20 @@ export function HistoricalMatches() {
     await startAnalysis()
   }
 
-  // Use real streaming progress if streaming, otherwise fallback
-  const progressPercent = streaming.isStreaming ? streaming.progressPercent : (isAnalyzing ? 0 : 100)
+  // Filter to show only visible agents (after historical matching setup)
+  const visibleAgents = AGENTS.filter(agent =>
+    !['requirement', 'historical_match', 'auto_select'].includes(agent.name)
+  )
+
+  // Count only visible agents for progress display
+  const visibleCompleted = streaming.completedAgents.filter(name =>
+    !['requirement', 'historical_match', 'auto_select'].includes(name)
+  ).length
+
+  // Use streaming progress, with intelligent fallback
+  // If all agents are complete, show 100% even if streaming stopped
+  const allAgentsComplete = streaming.completedAgents.length === AGENTS.length
+  const progressPercent = allAgentsComplete ? 100 : (streaming.isStreaming ? streaming.progressPercent : (isAnalyzing ? 0 : 100))
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -60,7 +72,7 @@ export function HistoricalMatches() {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Progress</span>
                   <span className="font-medium">
-                    {streaming.completedAgents.length} of {AGENTS.length} agents complete
+                    {visibleCompleted} of {visibleAgents.length} agents complete
                   </span>
                 </div>
                 <Progress value={progressPercent} className="h-2" />
@@ -78,11 +90,11 @@ export function HistoricalMatches() {
                 </div>
               )}
 
-              {/* Agent checklist grid */}
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                {AGENTS.map((agent, idx) => {
+              {/* Agent checklist grid - only show visible agents */}
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {visibleAgents.map((agent) => {
                   const isComplete = streaming.completedAgents.includes(agent.name)
-                  const isCurrent = idx === streaming.currentAgentIndex
+                  const isCurrent = agent.name === streaming.currentAgentName
                   const isPending = !isComplete && !isCurrent
 
                   return (

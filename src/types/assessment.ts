@@ -142,7 +142,7 @@ export interface AssessmentResult {
 }
 
 // Wizard state for new assessment flow
-export type WizardStep = 'input' | 'matches' | 'results';
+export type WizardStep = 'input' | 'matches' | 'complete' | 'estimation' | 'tdd' | 'jira';
 
 export interface WizardState {
   currentStep: WizardStep;

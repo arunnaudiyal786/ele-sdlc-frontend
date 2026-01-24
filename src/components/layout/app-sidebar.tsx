@@ -131,6 +131,11 @@ const mainNavItems: NavItem[] = [
     url: "/previous-outputs",
     icon: History,
   },
+  {
+    title: "SDLC (WIP)",
+    url: "/assessments/new",
+    icon: Zap,
+  },
 ]
 
 const secondaryNavItems: NavItem[] = [

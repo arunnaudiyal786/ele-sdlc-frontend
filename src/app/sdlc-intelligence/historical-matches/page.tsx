@@ -90,34 +90,37 @@ export default function HistoricalMatchesPage() {
               <div>
                 <h3 className="text-base font-semibold mb-1">Historical Match Algorithm</h3>
                 <p className="text-sm text-muted-foreground">
-                  Uses AI-powered hybrid search to find similar past projects by analyzing both meaning and keywords
+                  Hybrid search combining ChromaDB vector similarity (semantic) with keyword overlap scoring across multiple collections
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-3 text-sm">
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">Semantic 70%</div>
+                  <div className="font-bold text-primary">Semantic Search (70%)</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    AI understands the meaning and context of your requirement using vector embeddings
+                    Ollama all-minilm embeddings (384-dim) + ChromaDB cosine similarity across epics, estimations, and TDDs collections
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">Keyword 30%</div>
+                  <div className="font-bold text-primary">Keyword Search (30%)</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    Matches specific technical terms and important keywords from your requirement
+                    Extracts top 20 keywords (3+ chars, no stopwords) and scores by overlap: matches / total_keywords
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-bold text-primary">RRF Fusion</div>
+                  <div className="font-bold text-primary">Weighted Fusion</div>
                   <p className="text-muted-foreground leading-relaxed">
-                    Combines both scores using Reciprocal Rank Fusion to rank the best matches
+                    Final score = (0.7 × semantic_score) + (0.3 × keyword_score) with deduplication and ranking
                   </p>
                 </div>
               </div>
               <div className="border-t border-primary/10 pt-3">
                 <p className="text-sm text-muted-foreground">
-                  <strong className="text-foreground">How it works:</strong> Each match gets a combined score.
-                  Higher semantic scores mean the AI found similar concepts, while higher keyword scores indicate exact technical term matches.
-                  The system returns the top 10 most relevant historical projects to inform your impact assessment.
+                  <strong className="text-foreground">How it works:</strong> The system generates query embedding using Ollama all-minilm model (384 dimensions).
+                  ChromaDB performs cosine similarity search across epics, estimations, and tdds collections.
+                  Simultaneously, it extracts top 20 keywords from the query (3+ character words, filtering stopwords using Counter for frequency).
+                  For each result, keyword score = (number of keyword matches in doc) / (total query keywords).
+                  Final hybrid score = (0.7 × semantic_score) + (0.3 × keyword_score).
+                  Results are deduplicated by project_id and ranked by final score. Top 10 returned with score_breakdown showing both components.
                 </p>
               </div>
             </div>
