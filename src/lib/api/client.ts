@@ -6,6 +6,8 @@ import type {
   HealthResponse,
   StreamEvent,
   SessionListResponse,
+  HistoricalMatchRequest,
+  HistoricalMatchResponse,
 } from './types'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
@@ -50,6 +52,16 @@ async function fetchApi<T>(
 // Health check - verify backend is available
 export async function checkHealth(): Promise<HealthResponse> {
   return fetchApi<HealthResponse>('/api/v1/health')
+}
+
+// Find historical matches - searches for similar projects without running full pipeline
+export async function findHistoricalMatches(
+  request: HistoricalMatchRequest
+): Promise<HistoricalMatchResponse> {
+  return fetchApi<HistoricalMatchResponse>('/api/v1/historical-match/find-matches', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  })
 }
 
 // Run full pipeline - main entry point for impact assessment

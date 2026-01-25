@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, Loader2, Check, Users, Clock, TrendingUp, Circle } from "lucide-react"
+import { ArrowLeft, ArrowRight, Loader2, Check, Users, Clock, TrendingUp, Circle, CheckCircle2 } from "lucide-react"
 import { useWizard } from "@/contexts/wizard-context"
 import { useSDLC } from "@/contexts/sdlc-context"
 import { AGENTS } from "@/lib/api"
@@ -19,6 +19,8 @@ export function HistoricalMatches() {
     goToPreviousStep,
     startAnalysis,
     isAnalyzing,
+    isViewingFromComplete,
+    setCurrentStep,
   } = useWizard()
 
   const { streaming } = useSDLC()
@@ -144,14 +146,20 @@ export function HistoricalMatches() {
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Similar Historical Projects</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                {isViewingFromComplete && <CheckCircle2 className="h-5 w-5 text-green-500" />}
+                {isViewingFromComplete ? 'Selected Historical Matches' : 'Similar Historical Projects'}
+              </CardTitle>
               <CardDescription>
-                Select projects to use as baseline for impact estimation.
-                The AI found {matches.length} similar projects based on your requirement.
+                {isViewingFromComplete
+                  ? `${selectedMatchIds.length} project${selectedMatchIds.length !== 1 ? 's' : ''} were used as baseline for your impact assessment.`
+                  : `Select projects to use as baseline for impact estimation. The AI found ${matches.length} similar projects based on your requirement.`
+                }
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {matches.map((match) => {
+              {/* When viewing from complete, only show selected matches */}
+              {(isViewingFromComplete ? matches.filter(m => selectedMatchIds.includes(m.id)) : matches).map((match) => {
                 const isSelected = selectedMatchIds.includes(match.id)
                 const effortVariance = ((match.actualEffort - match.estimatedEffort) / match.estimatedEffort * 100).toFixed(0)
                 const wasUnderestimated = match.actualEffort > match.estimatedEffort
@@ -159,22 +167,34 @@ export function HistoricalMatches() {
                 return (
                   <div
                     key={match.id}
-                    onClick={() => toggleMatchSelection(match.id)}
+                    onClick={isViewingFromComplete ? undefined : () => toggleMatchSelection(match.id)}
                     className={cn(
-                      "cursor-pointer rounded-lg border p-4 transition-all",
-                      isSelected
-                        ? "border-primary bg-primary/5 ring-1 ring-primary"
-                        : "border-border hover:border-primary/50"
+                      "rounded-lg border p-4 transition-all",
+                      isViewingFromComplete
+                        ? "border-green-500/30 bg-green-500/5"
+                        : cn(
+                            "cursor-pointer",
+                            isSelected
+                              ? "border-primary bg-primary/5 ring-1 ring-primary"
+                              : "border-border hover:border-primary/50"
+                          )
                     )}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4">
-                        <Checkbox
-                          checked={isSelected}
-                          className="mt-1"
-                          onClick={(e) => e.stopPropagation()}
-                          onCheckedChange={() => toggleMatchSelection(match.id)}
-                        />
+                        {!isViewingFromComplete && (
+                          <Checkbox
+                            checked={isSelected}
+                            className="mt-1"
+                            onClick={(e) => e.stopPropagation()}
+                            onCheckedChange={() => toggleMatchSelection(match.id)}
+                          />
+                        )}
+                        {isViewingFromComplete && (
+                          <div className="flex h-5 w-5 items-center justify-center mt-1">
+                            <CheckCircle2 className="h-5 w-5 text-green-500" />
+                          </div>
+                        )}
                         <div className="space-y-2">
                           <div className="flex items-center gap-3">
                             <h4 className="font-semibold text-foreground">
@@ -264,18 +284,30 @@ export function HistoricalMatches() {
 
           {/* Action Buttons */}
           <div className="flex justify-between">
-            <Button variant="outline" onClick={goToPreviousStep}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-            <Button
-              size="lg"
-              onClick={handleGenerateAssessment}
-              disabled={!canProceed}
-            >
-              <Check className="mr-2 h-4 w-4" />
-              Generate Assessment ({selectedMatchIds.length} selected)
-            </Button>
+            {isViewingFromComplete ? (
+              <>
+                <div /> {/* Spacer for alignment */}
+                <Button onClick={() => setCurrentStep('complete')}>
+                  Back to Results
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={goToPreviousStep}>
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={handleGenerateAssessment}
+                  disabled={!canProceed}
+                >
+                  <Check className="mr-2 h-4 w-4" />
+                  Generate Assessment ({selectedMatchIds.length} selected)
+                </Button>
+              </>
+            )}
           </div>
         </>
       )}

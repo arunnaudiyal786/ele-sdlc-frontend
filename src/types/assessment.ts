@@ -177,7 +177,7 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
-  role: 'analyst' | 'manager' | 'developer' | 'admin';
+  role: string;
 }
 
 // Notification

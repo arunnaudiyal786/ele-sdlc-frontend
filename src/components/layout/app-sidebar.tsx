@@ -334,7 +334,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <span className="text-sm font-medium text-foreground">
               {currentUser.name}
             </span>
-            <span className="text-xs text-muted-foreground capitalize">
+            <span className="text-xs text-muted-foreground">
               {currentUser.role}
             </span>
           </div>

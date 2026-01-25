@@ -14,15 +14,17 @@ export function RequirementInput() {
     setRequirementText,
     epicId,
     setEpicId,
-    goToNextStep,
-    isAnalyzing,
+    searchMatches,
+    isSearching,
+    searchError,
   } = useWizard()
 
   const canProceed = requirementText.trim().length > 20
 
-  const handleAnalyze = () => {
+  const handleFindSimilarProjects = async () => {
     if (canProceed) {
-      goToNextStep()
+      // Search for historical matches (navigates to matches step on success)
+      await searchMatches()
     }
   }
 
@@ -122,17 +124,24 @@ export function RequirementInput() {
         </CardContent>
       </Card>
 
+      {/* Error display */}
+      {searchError && (
+        <div className="rounded-lg border border-destructive bg-destructive/10 p-4">
+          <p className="text-sm text-destructive">{searchError}</p>
+        </div>
+      )}
+
       {/* Action Buttons */}
       <div className="flex justify-end gap-4">
         <Button
           size="lg"
-          onClick={handleAnalyze}
-          disabled={!canProceed || isAnalyzing}
+          onClick={handleFindSimilarProjects}
+          disabled={!canProceed || isSearching}
         >
-          {isAnalyzing ? (
+          {isSearching ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyzing...
+              Searching...
             </>
           ) : (
             "Find Similar Projects"

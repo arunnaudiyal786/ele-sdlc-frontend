@@ -12,7 +12,7 @@ interface StepIndicatorProps {
 const steps: { id: WizardStep; label: string; number: number }[] = [
   { id: 'input', label: 'Input Requirement', number: 1 },
   { id: 'matches', label: 'Historical Matches', number: 2 },
-  { id: 'results', label: 'Impact Results', number: 3 },
+  { id: 'complete', label: 'Impact Results', number: 3 },
 ]
 
 export function StepIndicator({ currentStep, onStepClick }: StepIndicatorProps) {

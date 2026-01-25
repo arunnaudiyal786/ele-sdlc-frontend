@@ -70,7 +70,7 @@ interface SDLCContextType {
   // Streaming progress
   streaming: StreamingState
   // Actions
-  runImpactPipeline: (requirementText: string, jiraEpicId?: string) => () => void
+  runImpactPipeline: (requirementText: string, jiraEpicId?: string, selectedMatchIds?: string[]) => () => void
   resetPipeline: () => void
   loadSession: (response: PipelineResponse) => void
   // Agent status helpers
@@ -158,7 +158,8 @@ export function SDLCProvider({ children }: SDLCProviderProps) {
   // Run the full impact assessment pipeline with streaming
   const runImpactPipeline = React.useCallback((
     requirementText: string,
-    jiraEpicId?: string
+    jiraEpicId?: string,
+    selectedMatchIds?: string[]
   ): () => void => {
     const sessionId = generateSessionId()
 
@@ -188,6 +189,7 @@ export function SDLCProvider({ children }: SDLCProviderProps) {
         session_id: sessionId,
         requirement_text: requirementText,
         jira_epic_id: jiraEpicId,
+        selected_matches: selectedMatchIds,
       },
       {
         onPipelineStart: () => {
@@ -225,10 +227,13 @@ export function SDLCProvider({ children }: SDLCProviderProps) {
 
           // Update pipeline outputs incrementally
           if (output) {
+            // Backend uses "all_matches" during streaming, "historical_matches" at completion
+            const matches = (output.all_matches || output.historical_matches) as HistoricalMatchResult[] | undefined
+
             setPipeline(prev => ({
               ...prev,
               status: status ?? prev.status,
-              historicalMatches: (output.historical_matches as HistoricalMatchResult[]) ?? prev.historicalMatches,
+              historicalMatches: matches ?? prev.historicalMatches,
               impactedModules: output.impacted_modules_output as ImpactedModulesOutput ?? prev.impactedModules,
               estimationEffort: output.estimation_effort_output as EstimationEffortOutput ?? prev.estimationEffort,
               tdd: output.tdd_output as TDDOutput ?? prev.tdd,
@@ -248,12 +253,15 @@ export function SDLCProvider({ children }: SDLCProviderProps) {
             progressPercent: 100,
           }))
 
+          // Backend uses "all_matches" during streaming, "historical_matches" at completion
+          const matches = (output?.all_matches || output?.historical_matches) as HistoricalMatchResult[] | undefined
+
           // Final update with all outputs
           setPipeline(prev => ({
             ...prev,
             isRunning: false,
             status: status ?? 'completed',
-            historicalMatches: (output?.historical_matches as HistoricalMatchResult[]) ?? prev.historicalMatches,
+            historicalMatches: matches ?? prev.historicalMatches,
             impactedModules: (output?.impacted_modules_output as ImpactedModulesOutput) ?? prev.impactedModules,
             estimationEffort: (output?.estimation_effort_output as EstimationEffortOutput) ?? prev.estimationEffort,
             tdd: (output?.tdd_output as TDDOutput) ?? prev.tdd,

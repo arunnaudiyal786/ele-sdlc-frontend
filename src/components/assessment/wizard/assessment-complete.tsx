@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/card"
 
 export function AssessmentComplete() {
-  const { setCurrentStep, resetWizard, isAnalyzing } = useWizard()
+  const { setCurrentStep, resetWizard, isAnalyzing, viewMatchesFromComplete } = useWizard()
   const { pipeline, streaming } = useSDLC()
 
   const handleViewResults = () => {
@@ -28,7 +28,7 @@ export function AssessmentComplete() {
   }
 
   const handleViewMatches = () => {
-    setCurrentStep('matches')
+    viewMatchesFromComplete()
   }
 
   const handleViewEstimation = () => {

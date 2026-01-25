@@ -20,7 +20,7 @@ export const currentUser: User = {
   name: 'Arun Naudiyal',
   email: 'arun.naudiyal@elevance.com',
   avatar: '/avatars/arun.jpg',
-  role: 'developer', // Changed from 'Senior Consultant' to match User type
+  role: 'Sr AI Architect',
 };
 
 // Dashboard Statistics

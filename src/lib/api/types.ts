@@ -22,6 +22,23 @@ export type PipelineStatus =
   | 'completed'
   | 'error'
 
+// Historical Match Request - for find-matches endpoint
+export interface HistoricalMatchRequest {
+  session_id: string
+  query: string
+  semantic_weight?: number
+  keyword_weight?: number
+  max_results?: number
+}
+
+// Historical Match Response - from find-matches endpoint
+export interface HistoricalMatchResponse {
+  session_id: string
+  total_matches: number
+  matches: HistoricalMatchResult[]
+  search_time_ms: number
+}
+
 // Historical Match from search
 export interface HistoricalMatchResult {
   match_id: string
