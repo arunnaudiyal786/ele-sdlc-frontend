@@ -70,7 +70,7 @@ interface SDLCContextType {
   // Streaming progress
   streaming: StreamingState
   // Actions
-  runImpactPipeline: (requirementText: string, jiraEpicId?: string, selectedMatchIds?: string[]) => () => void
+  runImpactPipeline: (requirementText: string, jiraEpicId?: string, selectedMatchIds?: string[], existingSessionId?: string) => () => void
   resetPipeline: () => void
   loadSession: (response: PipelineResponse) => void
   // Agent status helpers
@@ -156,12 +156,15 @@ export function SDLCProvider({ children }: SDLCProviderProps) {
   const [streaming, setStreaming] = React.useState<StreamingState>(initialStreamingState)
 
   // Run the full impact assessment pipeline with streaming
+  // If existingSessionId is provided (e.g., from wizard search step), reuse it
   const runImpactPipeline = React.useCallback((
     requirementText: string,
     jiraEpicId?: string,
-    selectedMatchIds?: string[]
+    selectedMatchIds?: string[],
+    existingSessionId?: string
   ): () => void => {
-    const sessionId = generateSessionId()
+    // Reuse existing session ID if provided, otherwise generate new one
+    const sessionId = existingSessionId || generateSessionId()
 
     // Set running state
     setPipeline(prev => ({

@@ -87,6 +87,7 @@ const initialState: WizardState = {
   selectedMatchIds: [],
   isAnalyzing: false,
   analysisProgress: 0,
+  sessionId: null, // Session ID persisted across wizard steps
 }
 
 interface WizardProviderProps {
@@ -152,12 +153,14 @@ export function WizardProvider({ children }: WizardProviderProps) {
   }, [])
 
   // Step 1: Search for historical matches (without running full pipeline)
+  // Generates a session ID that will be reused for the full pipeline in Step 2
   const searchMatches = React.useCallback(async () => {
     setIsSearching(true)
     setSearchError(null)
     setMatches([])
 
     try {
+      // Generate session ID once and reuse across wizard steps
       const sessionId = generateSessionId()
       const response = await findHistoricalMatches({
         session_id: sessionId,
@@ -169,8 +172,8 @@ export function WizardProvider({ children }: WizardProviderProps) {
       const transformedMatches = response.matches.map(transformBackendMatch)
       setMatches(transformedMatches)
 
-      // Navigate to matches step
-      setState(prev => ({ ...prev, currentStep: 'matches' }))
+      // Navigate to matches step and save session ID for reuse in startAnalysis
+      setState(prev => ({ ...prev, currentStep: 'matches', sessionId }))
     } catch (error) {
       setSearchError(error instanceof Error ? error.message : 'Failed to search for matches')
     } finally {
@@ -179,17 +182,19 @@ export function WizardProvider({ children }: WizardProviderProps) {
   }, [state.requirementText])
 
   // Step 2: Start full pipeline analysis with selected matches
+  // Reuses the session ID from Step 1 (searchMatches) for a unified audit trail
   const startAnalysis = React.useCallback(async () => {
     setState(prev => ({ ...prev, isAnalyzing: true, analysisProgress: 0 }))
 
-    // Start the pipeline with selected match IDs
+    // Start the pipeline with selected match IDs, reusing the session ID from search
     const cleanup = runImpactPipeline(
       state.requirementText,
       state.epicId || undefined,
-      state.selectedMatchIds // Pass selected matches to pipeline
+      state.selectedMatchIds, // Pass selected matches to pipeline
+      state.sessionId || undefined // Reuse session ID from searchMatches
     )
     cleanupRef.current = cleanup
-  }, [runImpactPipeline, state.requirementText, state.epicId, state.selectedMatchIds])
+  }, [runImpactPipeline, state.requirementText, state.epicId, state.selectedMatchIds, state.sessionId])
 
   // Watch for pipeline completion to navigate to complete page
   React.useEffect(() => {

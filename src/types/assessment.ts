@@ -153,6 +153,7 @@ export interface WizardState {
   isAnalyzing: boolean;
   analysisProgress: number; // 0-100
   error?: string;
+  sessionId: string | null; // Session ID persisted across wizard steps
 }
 
 // Dashboard stats
